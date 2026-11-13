@@ -3,6 +3,7 @@ import type React from 'react';
 import { START_BUTTON_BOX, WELCOME_CANVAS, boxToPercent } from './layout';
 import { asset } from '../../app/asset';
 import { TitlePixel } from './TitlePixel';
+import { CoffeeMug } from './CoffeeMug';
 import { copy } from '../../copy/he';
 import './welcome.css';
 
@@ -39,6 +40,7 @@ export function WelcomeScreen({ onStart }: Props) {
       <div className="welcome__stage">
         <img className="welcome__art" src={bg} alt="" draggable={false} />
         <TitlePixel />
+        <CoffeeMug />
         <h1 className="visually-hidden">PIXEL PERFECT</h1>
         <button
           type="button"
