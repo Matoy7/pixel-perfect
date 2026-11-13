@@ -19,15 +19,7 @@ type Player = {
   completed_levels_count: number;
   game_completed: boolean;
 };
-type Activity = { user_id: string; event_type: string; level_id: number | null; created_at: string };
 type Sort = 'last_seen_at' | 'current_level';
-
-const EVENT_LABEL: Record<string, string> = {
-  game_started: 'התחיל משחק',
-  level_started: 'התחיל שלב',
-  level_completed: 'סיים שלב',
-  game_completed: 'סיים את המשחק',
-};
 
 const fmt = new Intl.DateTimeFormat('he-IL', { dateStyle: 'short', timeStyle: 'short' });
 const when = (iso: string) => fmt.format(new Date(iso));
@@ -37,8 +29,6 @@ export function Dashboard({ sb, email, onSignOut }: { sb: SupabaseClient; email:
   const [overview, setOverview] = useState<Overview | null>(null);
   const [levels, setLevels] = useState<LevelRow[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [activity, setActivity] = useState<Activity[]>([]);
-  const [names, setNames] = useState<Record<string, string>>({});
   const [sort, setSort] = useState<Sort>('last_seen_at');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -46,7 +36,7 @@ export function Dashboard({ sb, email, onSignOut }: { sb: SupabaseClient; email:
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
-    const [ov, lv, pl, ac] = await Promise.all([
+    const [ov, lv, pl] = await Promise.all([
       sb.rpc('admin_overview'),
       sb.rpc('admin_level_stats'),
       sb
@@ -55,24 +45,12 @@ export function Dashboard({ sb, email, onSignOut }: { sb: SupabaseClient; email:
         .order(sort, { ascending: false })
         .order('last_seen_at', { ascending: false })
         .limit(500),
-      sb.from('player_events').select('user_id,event_type,level_id,created_at').order('created_at', { ascending: false }).limit(20),
     ]);
-    const err = ov.error ?? lv.error ?? pl.error ?? ac.error;
+    const err = ov.error ?? lv.error ?? pl.error;
     if (err) setError(err.message);
     setOverview((ov.data as Overview) ?? null);
     setLevels((lv.data as LevelRow[]) ?? []);
-    const ps = (pl.data as Player[]) ?? [];
-    setPlayers(ps);
-    const acts = (ac.data as Activity[]) ?? [];
-    setActivity(acts);
-    // names for the activity feed (players already loaded cover most)
-    const map: Record<string, string> = Object.fromEntries(ps.map((p) => [p.user_id, p.display_name]));
-    const missing = [...new Set(acts.map((a) => a.user_id))].filter((id) => !map[id]);
-    if (missing.length) {
-      const { data } = await sb.from('players').select('user_id,display_name').in('user_id', missing);
-      for (const p of (data as { user_id: string; display_name: string }[]) ?? []) map[p.user_id] = p.display_name;
-    }
-    setNames(map);
+    setPlayers((pl.data as Player[]) ?? []);
     setLoading(false);
   }, [sb, sort]);
 
@@ -116,8 +94,7 @@ export function Dashboard({ sb, email, onSignOut }: { sb: SupabaseClient; email:
         <Tile label="פעילים ב-24 השעות האחרונות" value={overview?.active_24h} />
       </section>
 
-      <div className="adm-grid">
-        <section className="adm-card">
+      <section className="adm-card">
           <h2 className="adm-h2">שלבים</h2>
           <div className="adm-legend adm-small">
             <span>
@@ -169,26 +146,6 @@ export function Dashboard({ sb, email, onSignOut }: { sb: SupabaseClient; email:
           </table>
           </div>
         </section>
-
-        <section className="adm-card">
-          <h2 className="adm-h2">פעילות אחרונה</h2>
-          {activity.length === 0 ? (
-            <p className="adm-muted">אין עדיין פעילות.</p>
-          ) : (
-            <ul className="adm-feed">
-              {activity.map((a, i) => (
-                <li key={i}>
-                  <span>
-                    <b>{names[a.user_id] ?? a.user_id.slice(0, 8)}</b> · {EVENT_LABEL[a.event_type] ?? a.event_type}
-                    {a.level_id ? ` ${a.level_id}` : ''}
-                  </span>
-                  <span className="adm-muted adm-small">{when(a.created_at)}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      </div>
 
       <section className="adm-card">
         <div className="adm-card__head">
