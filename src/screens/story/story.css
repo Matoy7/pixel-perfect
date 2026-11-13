@@ -49,62 +49,22 @@
   }
 }
 
-/* ---- camera moves (very subtle Ken Burns), over the whole shot ---- */
+/* ---- camera: keyframes set from JS (StoryScreen › Shot) ---- */
 .shot__camera {
+  transform-origin: 0 0;
   will-change: transform;
-  animation-duration: var(--dur);
-  animation-fill-mode: both;
-  animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-.shot__camera--zoomIn {
-  animation-name: cam-zoom-in;
-}
-.shot__camera--zoomOut {
-  animation-name: cam-zoom-out;
-}
-.shot__camera--panLeft {
-  animation-name: cam-pan-left;
-}
-.shot__camera--discover {
-  animation-name: cam-discover;
-  animation-timing-function: linear;
 }
 
-@keyframes cam-zoom-in {
-  from {
-    transform: scale(1);
-  }
-  to {
-    transform: scale(1.045);
-  }
+/* ---- scene 1 clock rebuilt for the 9:00 → 10:00 close-up ---- */
+.clock {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
 }
-@keyframes cam-zoom-out {
-  from {
-    transform: scale(1.04);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-@keyframes cam-pan-left {
-  from {
-    transform: scale(1.03) translateX(0.8%);
-  }
-  to {
-    transform: scale(1.03) translateX(-0.8%);
-  }
-}
-/* settle on Yotam's reaction, then a slow push centred on the monitor pixel.
-   Max 4%: more would crop the caption box at the screen edges. */
-@keyframes cam-discover {
-  0%,
-  45% {
-    transform: scale(1);
-    animation-timing-function: cubic-bezier(0.4, 0, 0.3, 1);
-  }
-  100% {
-    transform: scale(1.04);
-  }
+.clock__part {
+  position: absolute;
+  display: block;
 }
 
 /* ---- skip ---- */
@@ -134,8 +94,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .shot__jitter--on,
-  .shot__camera {
+  .shot__jitter--on {
     animation: none;
   }
 }

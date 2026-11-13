@@ -2,7 +2,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type React from 'react';
 import { ExtendedArt } from '../../ui/ExtendedArt';
 import { copy } from '../../copy/he';
-import { DISCOVERY_PIXEL, OUTRO_FADE_MS, SCENES, STORY_CANVAS, sceneArt, type Scene } from './scenes';
+import { OUTRO_FADE_MS, SCENES, STORY_CANVAS, sceneArt, type CameraCtx, type Scene } from './scenes';
+import { CLOCK_ASSETS, ClockHands } from './ClockHands';
 import { FIGHT_ASSETS, FIGHT_BG } from './fightCloud';
 import { FightCloud } from './FightCloud';
 import './story.css';
@@ -17,6 +18,7 @@ const STORY_ASSETS = [
     return s.id === 4 ? [a.extTop, a.extBottom] : [a.src, a.extTop, a.extBottom];
   }),
   ...FIGHT_ASSETS,
+  ...CLOCK_ASSETS,
 ];
 
 let preload: Promise<void> | null = null;
@@ -112,36 +114,43 @@ function Shot({ scene, entering }: { scene: Scene; entering: boolean }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const cameraRef = useRef<HTMLDivElement>(null);
 
-  // The discovery push centres on the pixel: put the camera's transform origin
-  // exactly on it (stage position + pixel position inside the art).
+  // Camera: keyframes are resolved against the live layout, so zooms land
+  // exactly on their target (clock, monitor screen) on every screen size.
   useLayoutEffect(() => {
-    if (scene.camera !== 'discover') return;
     const stage = stageRef.current;
     const cam = cameraRef.current;
     if (!stage || !cam) return;
-    const place = () => {
-      const s = stage.getBoundingClientRect();
-      const c = cam.getBoundingClientRect();
-      const k = s.width / STORY_CANVAS.width;
-      const px = s.left - c.left + (DISCOVERY_PIXEL.x + DISCOVERY_PIXEL.size / 2) * k;
-      const py = s.top - c.top + (DISCOVERY_PIXEL.y + DISCOVERY_PIXEL.size / 2) * k;
-      cam.style.transformOrigin = `${px}px ${py}px`;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const s = stage.getBoundingClientRect();
+    const c = cam.getBoundingClientRect();
+    const k = s.width / STORY_CANVAS.width;
+    const q = { x: c.width / 2, y: c.height / 2 }; // screen centre (camera space)
+    const at = (x: number, y: number, sc: number) =>
+      `translate(${q.x - sc * x}px, ${q.y - sc * y}px) scale(${sc})`;
+    const ctx: CameraCtx = {
+      center: (sc) => at(q.x, q.y, sc),
+      focus: (p, sc) => at(s.left - c.left + p.x * k, s.top - c.top + p.y * k, sc),
     };
-    place();
-  }, [scene.camera]);
+    const keys = scene.camera(ctx);
+    const total = keys[keys.length - 1].t || 1;
+    const anim = cam.animate(
+      keys.map((key) => ({
+        offset: key.t / total,
+        transform: key.transform,
+        easing: key.easing ?? 'linear',
+      })),
+      { duration: total, fill: 'both' },
+    );
+    return () => anim.cancel();
+  }, [scene]);
 
   return (
     <div
       className={`shot${entering ? ' shot--entering' : ''}`}
-      style={
-        {
-          '--fade': `${scene.fadeIn}ms`,
-          '--dur': `${scene.duration + 400}ms`,
-        } as React.CSSProperties
-      }
+      style={{ '--fade': `${scene.fadeIn}ms` } as React.CSSProperties}
     >
       <div className={`shot__jitter${scene.jitter ? ' shot__jitter--on' : ''}`}>
-        <div ref={cameraRef} className={`shot__camera shot__camera--${scene.camera}`}>
+        <div ref={cameraRef} className="shot__camera">
           <ExtendedArt
             ref={stageRef}
             src={scene.id === 4 ? FIGHT_BG : art.src}
@@ -149,6 +158,7 @@ function Shot({ scene, entering }: { scene: Scene; entering: boolean }) {
             extBottom={art.extBottom}
             canvas={STORY_CANVAS}
           >
+            {scene.id === 1 && <ClockHands />}
             {scene.id === 4 && <FightCloud />}
           </ExtendedArt>
         </div>

@@ -129,3 +129,49 @@ boxes["chars"] = save_rgba(src, chars_hard, f"{OUT}/scene-4-chars.webp")
 boxes["cloudCenter"] = [round(cx, 1), round(cy, 1)]
 
 print(json.dumps(boxes))
+
+# ---------------------------------------------------------------------------
+# Scene 1 clock (for the "time passes" close-up): clean face + real hands
+# ---------------------------------------------------------------------------
+s1 = cv2.imread(f"{ART}/scene-1.png")
+dark = s1.max(axis=2).astype(int) < 110
+yy1, xx1 = np.mgrid[0:H, 0:W]
+ring = np.where(dark[440:660, 40:280])
+CX = (s1[549, 40:280].max(axis=1) < 110).nonzero()[0]
+CX = (CX.min() + CX.max()) / 2 + 40  # outer ring left/right → centre x
+col = (s1[430:670, int(CX)].max(axis=1) < 110).nonzero()[0]
+CY = (col.min() + col.max()) / 2 + 430
+R = 106
+dx, dy = xx1 - CX, yy1 - CY
+rad = np.sqrt(dx * dx + dy * dy)
+minute = dark & (np.abs(dx) <= 6) & (dy < 0) & (rad <= 89)
+hour = dark & (np.abs(dy) <= 6) & (dx < 0) & (rad <= 72)
+cap = dark & (rad <= 10)
+hands = (minute | hour | cap).astype(np.uint8)
+
+face_col = np.median(s1[(rad < 60) & ~cv2.dilate(hands, ell(9)).astype(bool)], axis=0)
+hand_col = np.median(s1[cv2.erode(minute.astype(np.uint8), np.ones((3, 3), np.uint8)).astype(bool)], axis=0)
+lum = lambda c: c[..., 0] * 0.114 + c[..., 1] * 0.587 + c[..., 2] * 0.299
+L = lum(s1.astype(np.float32))
+hand_alpha = np.clip((lum(face_col) - L) / (lum(face_col) - lum(hand_col)), 0, 1)
+
+def hand_sprite(mask, box, path):
+    m = cv2.dilate(mask.astype(np.uint8), np.ones((5, 5), np.uint8)).astype(np.float32)
+    flat = np.zeros_like(s1)
+    flat[:] = hand_col.astype(np.uint8)
+    return save_rgba(flat, hand_alpha * m, path, box)
+
+CXi, CYi = int(round(CX)), int(round(CY))
+clock = {"center": [round(float(CX), 1), round(float(CY), 1)]}
+clock["minute"] = hand_sprite(minute, (CXi - 8, CYi - 92, 16, 92), f"{OUT}/clock-minute.webp")
+clock["hour"] = hand_sprite(hour, (CXi - 75, CYi - 8, 75, 16), f"{OUT}/clock-hour.webp")
+clock["cap"] = hand_sprite(cap, (CXi - 12, CYi - 12, 24, 24), f"{OUT}/clock-cap.webp")
+
+# face without hands; the 12 o'clock tick (partly under the minute hand) is
+# restored from the 6 o'clock tick rotated 180°
+face = cv2.inpaint(s1, cv2.dilate(hands, ell(7)) * 255, 5, cv2.INPAINT_TELEA)
+t6 = s1[CYi + 70:CYi + 100, CXi - 8:CXi + 9]
+face[CYi - 99:CYi - 69, CXi - 8:CXi + 9] = t6[::-1, ::-1]
+fb = (CXi - R - 6, CYi - R - 6, 2 * R + 12, 2 * R + 12)
+clock["face"] = save_rgba(face, np.ones((H, W), np.float32), f"{OUT}/clock-face.webp", fb)
+print("CLOCK", json.dumps(clock))
