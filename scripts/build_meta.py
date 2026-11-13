@@ -3,8 +3,10 @@
   public/favicon.svg, favicon-32.png, apple-touch-icon.png (180), icon-512.png
       a lavender tile with the game's black pixel and two pixel fragments
       flying off it (like the title pixel's animation)
-  public/og-image.png (1200x630)
-      the welcome art's monitor with the PIXEL PERFECT title
+  public/og-image.jpg (1200x630, kept well under 300 KB)
+      the welcome art's monitor with the PIXEL PERFECT title.
+      WhatsApp silently drops preview images over ~300 KB (officially 600 KB),
+      so this is a JPEG with its quality stepped down until it fits.
 
 Usage:  python3 scripts/build_meta.py
 """
@@ -44,5 +46,16 @@ W = art.width
 H = round(W * 630 / 1200)
 cy = 690  # title centre on the monitor (source px)
 og = art.crop((0, cy - H // 2, W, cy - H // 2 + H)).resize((1200, 630), Image.LANCZOS)
-og.save("public/og-image.png", optimize=True)
-print("og", og.size)
+import io, os
+
+LIMIT = 250 * 1024  # margin under WhatsApp's ~300 KB
+for q in range(90, 59, -5):
+    buf = io.BytesIO()
+    og.save(buf, "JPEG", quality=q, optimize=True, progressive=True)
+    if buf.tell() <= LIMIT:
+        break
+with open("public/og-image.jpg", "wb") as f:
+    f.write(buf.getvalue())
+if os.path.exists("public/og-image.png"):
+    os.remove("public/og-image.png")
+print(f"og {og.size} jpeg q={q} {buf.tell() // 1024} KB")
