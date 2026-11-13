@@ -1,5 +1,5 @@
 import { asset } from '../../app/asset';
-import { TUTORIAL } from '../../game/levels';
+import { TUTORIAL, pixelBox } from '../../game/levels';
 import { stageLayout } from '../../ui/stageLayout';
 import { HANDOFF_SCALE, HANDOFF_ZOOM_MS } from '../tutorial/handoff';
 
@@ -137,7 +137,7 @@ export const SCENES: Scene[] = [
  */
 function handoffKeys(c: CameraCtx, t0: number): CameraKey[] {
   const jar = stageLayout(TUTORIAL.canvas, c.viewport);
-  const jp = TUTORIAL.pixel;
+  const jp = pixelBox(TUTORIAL.pixel, jar.k);
   const target = jar.toScreen(jp.x + jp.width / 2, jp.y + jp.height / 2);
   const p = { x: STORY_PIXEL.x + STORY_PIXEL.width / 2, y: STORY_PIXEL.y + STORY_PIXEL.height / 2 };
   const sStart = SCREEN_ZOOM;

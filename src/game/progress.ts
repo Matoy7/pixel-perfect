@@ -7,9 +7,11 @@ const KEY = 'pixel-perfect:progress:v1';
 export type Progress = {
   /** Story intro watched (or skipped) at least once. (Recorded only; the story plays on every PLAY.) */
   storySeen: boolean;
+  /** Number of numbered levels completed (the tutorial never counts). Next level = this index. */
+  levelsCompleted: number;
 };
 
-const DEFAULTS: Progress = { storySeen: false };
+const DEFAULTS: Progress = { storySeen: false, levelsCompleted: 0 };
 
 export function loadProgress(): Progress {
   try {

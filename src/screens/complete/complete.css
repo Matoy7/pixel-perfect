@@ -1,0 +1,52 @@
+.complete {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #ead9f2;
+}
+.complete__card {
+  width: min(100%, 340px);
+  padding: 28px 22px 22px;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(60, 30, 80, 0.2);
+  text-align: center;
+  color: #3a2a52;
+  animation: pz-card-in 380ms cubic-bezier(0.25, 0.8, 0.3, 1.1) both;
+}
+.complete__title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 700;
+}
+.complete__text {
+  margin: 0 0 20px;
+  font-size: 15px;
+  opacity: 0.8;
+}
+.complete__again {
+  width: 100%;
+  margin: 0;
+  padding: 13px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffd21f;
+  box-shadow: 0 4px 0 #e2a20b;
+  color: #2b1f12;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.complete__again:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #e2a20b;
+}
+@keyframes pz-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}

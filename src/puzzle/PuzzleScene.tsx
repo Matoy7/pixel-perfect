@@ -3,7 +3,7 @@ import type React from 'react';
 import { ExtendedArt } from '../ui/ExtendedArt';
 import { boxToPercent } from '../ui/geometry';
 import { clientToSource, isHit } from '../game/hitTest';
-import type { PuzzleConfig } from '../game/levels';
+import { pixelBox, type PuzzleConfig } from '../game/levels';
 import './puzzle.css';
 
 const MAX_ZOOM = 4;
@@ -76,9 +76,10 @@ export function PuzzleScene({ config, intro, onFound }: Props) {
     const stage = stageRef.current!.getBoundingClientRect();
     const vp = size();
     const k = stage.width / config.canvas.width;
+    const box = pixelBox(config.pixel, k);
     const p = {
-      x: stage.left - vp.left + (config.pixel.x + config.pixel.width / 2) * k,
-      y: stage.top - vp.top + (config.pixel.y + config.pixel.height / 2) * k,
+      x: stage.left - vp.left + (box.x + box.width / 2) * k,
+      y: stage.top - vp.top + (box.y + box.height / 2) * k,
     };
     // geometric scale steps → constant-feeling zoom speed
     const N = 10;
@@ -187,7 +188,8 @@ export function PuzzleScene({ config, intro, onFound }: Props) {
     if (!interactive.current || found) return;
     const stage = stageRef.current!.getBoundingClientRect();
     const src = clientToSource({ x: clientX, y: clientY }, stage, config.canvas.width);
-    if (isHit(src, config.pixel, src.k)) {
+    const atFit = src.k / view.current.s; // CSS px per source px with no zoom
+    if (isHit(src, pixelBox(config.pixel, atFit), src.k)) {
       setFound(true);
       return;
     }
@@ -207,7 +209,17 @@ export function PuzzleScene({ config, intro, onFound }: Props) {
   };
 
   // ---- render ---------------------------------------------------------------
-  const pixelPos = boxToPercent(config.pixel, config.canvas);
+  // 'box': source-px box in canvas %. 'css': centred point, fixed CSS size
+  // (inside the stage, so at fit it is exactly that size and it zooms with the art)
+  const pixelPos: React.CSSProperties =
+    config.pixel.kind === 'box'
+      ? boxToPercent(config.pixel.box, config.canvas)
+      : {
+          left: `calc(${(config.pixel.center.x / config.canvas.width) * 100}% - ${config.pixel.size / 2}px)`,
+          top: `calc(${(config.pixel.center.y / config.canvas.height) * 100}% - ${config.pixel.size / 2}px)`,
+          width: config.pixel.size,
+          height: config.pixel.size,
+        };
   return (
     <div
       ref={viewportRef}

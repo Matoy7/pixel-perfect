@@ -15,8 +15,17 @@ export const copy = {
     successText: 'ככה משחקים בכל שלב.',
     continue: 'המשך לשלב 1',
   },
-  levelPlaceholder: {
-    title: 'שלב 1 יגיע בקרוב',
-    back: 'חזרה למסך הפתיחה',
+  level: {
+    label: (n: number) => `שלב ${n}`,
+    hint: (n: number) => `שלב ${n} · מצא את הפיקסל השחור`,
+    successTitle: 'מצאת!',
+    successText: (n: number) => `שלב ${n} הושלם.`,
+    next: (n: number) => `המשך לשלב ${n}`,
+    finish: 'המשך',
   },
-} as const;
+  complete: {
+    title: 'כל הכבוד! סיימת את כל השלבים',
+    text: 'שלבים נוספים בקרוב.',
+    playAgain: 'שחק שוב',
+  },
+};

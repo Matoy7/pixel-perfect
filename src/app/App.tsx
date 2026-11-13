@@ -3,16 +3,18 @@ import { WelcomeScreen } from '../screens/welcome/WelcomeScreen';
 import { StoryScreen, preloadStory } from '../screens/story/StoryScreen';
 import { TutorialScreen } from '../screens/tutorial/TutorialScreen';
 import { HANDOFF_FADE_MS } from '../screens/tutorial/handoff';
-import { LevelPlaceholder } from '../screens/level/LevelPlaceholder';
+import { LevelScreen } from '../screens/level/LevelScreen';
+import { CompleteScreen } from '../screens/complete/CompleteScreen';
 import { flowReducer } from '../game/flow';
 import { loadProgress, saveProgress } from '../game/progress';
-import { TUTORIAL, puzzleAssets } from '../game/levels';
+import { LEVELS, TUTORIAL, puzzleAssets } from '../game/levels';
 import { preloadImages } from '../ui/preload';
 
 export function App() {
   const [state, dispatch] = useReducer(flowReducer, undefined, () => ({
     screen: { name: 'welcome' as const },
     progress: loadProgress(),
+    levelCount: LEVELS.length,
   }));
   /** Story stays mounted on top of the tutorial while it fades (pixel hand-off). */
   const [storyFading, setStoryFading] = useState(false);
@@ -25,7 +27,11 @@ export function App() {
     const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 300));
     if (screen.name === 'welcome') idle(() => void preloadStory());
     if (screen.name === 'story') idle(() => void preloadImages(puzzleAssets(TUTORIAL)));
-  }, [screen.name]);
+    if (screen.name === 'tutorial' || screen.name === 'level') {
+      const next = screen.name === 'level' ? screen.index + 1 : state.progress.levelsCompleted;
+      if (LEVELS[next]) idle(() => void preloadImages(puzzleAssets(LEVELS[next])));
+    }
+  }, [screen, state.progress.levelsCompleted]);
 
   const onStoryDone = (how: 'end' | 'skip') => {
     if (how === 'end') {
@@ -44,7 +50,15 @@ export function App() {
       {screen.name === 'tutorial' && (
         <TutorialScreen fromStory={screen.fromStory} onDone={() => dispatch({ type: 'TUTORIAL_DONE' })} />
       )}
-      {screen.name === 'level' && <LevelPlaceholder onBack={() => dispatch({ type: 'BACK_TO_WELCOME' })} />}
+      {screen.name === 'level' && (
+        // key: a fresh puzzle for each level
+        <LevelScreen
+          key={screen.index}
+          index={screen.index}
+          onDone={() => dispatch({ type: 'LEVEL_DONE', index: screen.index })}
+        />
+      )}
+      {screen.name === 'complete' && <CompleteScreen onPlayAgain={() => dispatch({ type: 'PLAY_AGAIN' })} />}
       {showStory && (
         <div
           className={`app__layer${storyFading ? ' app__layer--fading' : ''}`}

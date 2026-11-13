@@ -9,15 +9,21 @@ export type Screen =
   | { name: 'welcome' }
   | { name: 'story' }
   | { name: 'tutorial'; fromStory: boolean }
-  | { name: 'level'; index: number };
+  | { name: 'level'; index: number }
+  | { name: 'complete' };
 
-export type FlowState = { screen: Screen; progress: Progress };
+export type FlowState = { screen: Screen; progress: Progress; levelCount: number };
 
 export type FlowAction =
   | { type: 'PLAY' } // start button on the welcome screen
   | { type: 'STORY_DONE'; skipped: boolean } // story finished (hand-off) or skipped
-  | { type: 'TUTORIAL_DONE' } // continue → Level 1 (tutorial is never saved as progress)
-  | { type: 'BACK_TO_WELCOME' };
+  | { type: 'TUTORIAL_DONE' } // → next uncompleted level (tutorial is never saved)
+  | { type: 'LEVEL_DONE'; index: number } // saved immediately
+  | { type: 'PLAY_AGAIN' }; // completion → Level 1
+
+/** Next uncompleted level, or completion when all available levels are done. */
+const nextScreen = (completed: number, count: number): Screen =>
+  completed < count ? { name: 'level', index: completed } : { name: 'complete' };
 
 export function flowReducer(state: FlowState, action: FlowAction): FlowState {
   switch (action.type) {
@@ -25,12 +31,19 @@ export function flowReducer(state: FlowState, action: FlowAction): FlowState {
       return { ...state, screen: { name: 'story' } };
     case 'STORY_DONE':
       return {
+        ...state,
         screen: { name: 'tutorial', fromStory: !action.skipped },
         progress: { ...state.progress, storySeen: true },
       };
     case 'TUTORIAL_DONE':
+      return { ...state, screen: nextScreen(state.progress.levelsCompleted, state.levelCount) };
+    case 'LEVEL_DONE': {
+      const levelsCompleted = Math.max(state.progress.levelsCompleted, action.index + 1);
+      const screen: Screen =
+        action.index + 1 < state.levelCount ? { name: 'level', index: action.index + 1 } : { name: 'complete' };
+      return { ...state, screen, progress: { ...state.progress, levelsCompleted } };
+    }
+    case 'PLAY_AGAIN':
       return { ...state, screen: { name: 'level', index: 0 } };
-    case 'BACK_TO_WELCOME':
-      return { ...state, screen: { name: 'welcome' } };
   }
 }
