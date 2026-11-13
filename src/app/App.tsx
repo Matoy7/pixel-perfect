@@ -10,7 +10,7 @@ import { flowReducer, type FlowAction } from '../game/flow';
 import { clearLegacyProgress } from '../game/progress';
 import { LEVELS, TUTORIAL, puzzleAssets } from '../game/levels';
 import { preloadImages } from '../ui/preload';
-import { track } from '../analytics/track';
+import { track, trackDevice } from '../analytics/track';
 
 export function App() {
   const [state, dispatch] = useReducer(flowReducer, undefined, () => ({
@@ -23,7 +23,10 @@ export function App() {
   useEffect(clearLegacyProgress, []);
 
   // ---- anonymous analytics (never blocks the game; tutorial is not a level) ----
-  useEffect(() => track('visit'), []);
+  useEffect(() => {
+    track('visit'); // creates the player on the first visit
+    trackDevice();
+  }, []);
   useEffect(() => {
     if (state.screen.name === 'level') track('level_started', state.screen.index + 1);
   }, [state.screen]);

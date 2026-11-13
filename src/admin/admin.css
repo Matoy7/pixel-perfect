@@ -274,3 +274,19 @@ input {
   background: #fff;
   box-shadow: 0 1px 3px rgba(60, 30, 80, 0.15);
 }
+
+/* devices */
+.adm-dev {
+  display: grid;
+  gap: 14px;
+}
+.adm-dev__types {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.adm-dev__type {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #faf6fc;
+}

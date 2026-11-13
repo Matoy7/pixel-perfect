@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createSupabase } from './supabase';
+import { detectDevice } from './device';
 
 /**
  * Anonymous player analytics. Fire-and-forget: nothing here ever blocks or
@@ -42,6 +43,24 @@ export function track(event: TrackEvent, level?: number): void {
       if (!sb) return;
       const { error } = await sb.rpc('track_event', { p_event: event, p_level: level ?? null });
       if (error) console.warn('[analytics]', event, error.message);
+    })
+    .catch(() => {});
+}
+
+/** Record the player's device once per visit (call after the first 'visit'). */
+export function trackDevice(): void {
+  queue = queue
+    .then(async () => {
+      const sb = await player();
+      if (!sb) return;
+      const d = await detectDevice();
+      const { error } = await sb.rpc('set_device', {
+        p_type: d.type,
+        p_os: d.os,
+        p_browser: d.browser,
+        p_model: d.model,
+      });
+      if (error) console.warn('[analytics] device', error.message);
     })
     .catch(() => {});
 }

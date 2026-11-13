@@ -29,6 +29,11 @@ for normal play; consider enabling CAPTCHA later if you see abuse.
 Row Level Security is on for all three tables: a player can read only their own
 rows and cannot write any table directly; admins can read everything.
 
+### 3b. Device info (migration 0002)
+Run `supabase/migrations/0002_player_device.sql` the same way. It adds the
+player's device (phone / tablet / computer, model, OS, browser) to `players`
+plus the dashboard's device summary. Safe to re-run; existing data is kept.
+
 ## 4. Create your admin login
 1. **Authentication → Users → Add user → Create new user** – your email + a strong
    password, tick **Auto Confirm User**.
@@ -64,6 +69,11 @@ For local development, copy `.env.example` to `.env.local` with the same values.
 | a numbered level appears | `level_started` (level number) |
 | its pixel is found | `level_completed` (level number) |
 | the last level's pixel is found | `game_completed` |
+| page opened (after `visit`) | device: type, model, OS, browser (latest kept) |
+
+Device limits: Apple never reveals the iPhone / iPad model (shown as "iPhone");
+Android shows the model code when the browser exposes it (e.g. `SM-S911B` =
+Galaxy S23); computers show the OS (Windows / macOS…), not the machine model.
 
 The tutorial is never tracked. No names, emails or personal data are collected;
 display names like "Player 4821" are generated and are not unique.
