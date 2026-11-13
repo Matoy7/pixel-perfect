@@ -34,10 +34,26 @@ def recolor_dark(img, box, dark_bgr, light_bgr, thresh=150):
     img[y:y + h, x:x + w] = (roi * (1 - alpha) + target * alpha).clip(0, 255).astype(np.uint8)
 
 
+def paint_out_rows(img, box, pad=3):
+    """Remove an element inside box (x, y, w, h) on a flat-ish surface: each row
+    is rebuilt by interpolating the surface colour just left and right of it."""
+    x, y, w, h = box
+    for r in range(y, y + h):
+        left = img[r, x - pad - 2:x - pad + 1].astype(np.float32).mean(axis=0)
+        right = img[r, x + w + pad - 1:x + w + pad + 2].astype(np.float32).mean(axis=0)
+        t = np.linspace(0, 1, w + 2 * pad)[:, None]
+        img[r, x - pad:x + w + pad] = (left * (1 - t) + right * t).astype(np.uint8)
+    # soften the row seams inside the patch
+    patch = img[y - 1:y + h + 1, x - pad:x + w + pad]
+    img[y:y + h, x - pad:x + w + pad] = cv2.GaussianBlur(patch, (3, 3), 0)[1:-1]
+
+
 # Per-level art fixes (applied at build time; the source art stays untouched)
 FIXES = {
     # Level 1: the banana bunch's dark stem tip looked like the black pixel → banana yellow
     "1": lambda img: recolor_dark(img, (541, 595, 22, 21), dark_bgr=(18, 160, 222), light_bgr=(40, 214, 252)),
+    # Level 3: the black label on the yellow suitcase (carousel) looked like the pixel → suitcase yellow
+    "3": lambda img: paint_out_rows(img, (770, 1080, 19, 22)),
 }
 os.makedirs(OUT, exist_ok=True)
 

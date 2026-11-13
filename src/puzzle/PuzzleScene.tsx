@@ -241,7 +241,10 @@ export function PuzzleScene({ config, intro, onFound }: Props) {
         >
           {/* revealed under the burst: the art without its pixel */}
           <img className="puzzle__clean" src={config.imageClean} alt="" draggable={false} />
-          <div className="puzzle__pixel" style={pixelPos}>
+          <div
+            className="puzzle__pixel"
+            style={{ ...pixelPos, ['--pixel-color' as string]: config.pixelColor ?? '#000' }}
+          >
             <div className="puzzle__pixel-core" />
             {found &&
               Array.from({ length: FRAGMENTS }, (_, i) => {
