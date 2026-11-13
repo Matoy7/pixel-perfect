@@ -1,18 +1,18 @@
 import { useRef } from 'react';
-import { MUG_BOX, MUG_HEART_BOX, PORTFOLIO_URL, boxToPercent } from './layout';
+import { MUG_BOX, MUG_SYMBOL_BOX, PORTFOLIO_URL, boxToPercent } from './layout';
 import { asset } from '../../app/asset';
 import { copy } from '../../copy/he';
 import './coffee-mug.css';
 
-/** Heart box relative to the mug box. */
-const heartInMug = boxToPercent(
-  { ...MUG_HEART_BOX, x: MUG_HEART_BOX.x - MUG_BOX.x, y: MUG_HEART_BOX.y - MUG_BOX.y },
+/** Symbol box relative to the mug box. */
+const symbolInMug = boxToPercent(
+  { ...MUG_SYMBOL_BOX, x: MUG_SYMBOL_BOX.x - MUG_BOX.x, y: MUG_SYMBOL_BOX.y - MUG_BOX.y },
   MUG_BOX,
 );
 
 /**
- * Coffee mug easter egg: the pixel heart beats continuously; hovering lifts the
- * mug (hover-capable devices only); a tap/click plays a press + heart pulse and
+ * Coffee mug easter egg: the pixel </> on the mug pulses continuously; hovering lifts the
+ * mug (hover-capable devices only); a tap/click plays a press + symbol pulse and
  * opens the portfolio in a new tab.
  *
  * It is a real <a target="_blank"> so the browser opens the tab natively on
@@ -56,11 +56,11 @@ export function CoffeeMug() {
       <span className="mug__lift">
         <span className="mug__press" ref={pressRef}>
           <img className="mug__img" src={asset('assets/welcome/mug.webp')} alt="" draggable={false} />
-          <span className="mug__heart" style={heartInMug}>
-            <span className="mug__heart-pulse" ref={pulseRef}>
+          <span className="mug__symbol" style={symbolInMug}>
+            <span className="mug__symbol-pulse" ref={pulseRef}>
               <img
-                className="mug__heart-beat"
-                src={asset('assets/welcome/mug-heart.svg')}
+                className="mug__symbol-beat"
+                src={asset('assets/welcome/mug-code.svg')}
                 alt=""
                 draggable={false}
               />

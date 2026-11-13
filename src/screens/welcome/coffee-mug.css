@@ -49,24 +49,24 @@
   display: block;
 }
 
-/* ---- heart ---- */
-.mug__heart {
+/* ---- </> symbol ---- */
+.mug__symbol {
   position: absolute;
   display: block;
 }
 
-.mug__heart-pulse {
+.mug__symbol-pulse {
   position: absolute;
   inset: 0;
   display: block;
 }
 
 /*
- * Heartbeat: double beat (118%, 115%) then a pause. 1.4s cycle.
+ * Heartbeat on the </> symbol: double beat (118%, 115%) then a pause. 1.4s cycle.
  * The vector is laid out at 140% and scaled down at rest, so the browser
  * rasterises it large and every beat is a downscale: edges stay crisp.
  */
-.mug__heart-beat {
+.mug__symbol-beat {
   position: absolute;
   left: -20%;
   top: -20%;
@@ -75,10 +75,10 @@
   display: block;
   --rest: calc(1 / 1.4);
   transform: scale(var(--rest));
-  animation: mug-heartbeat 1.4s infinite;
+  animation: mug-symbol-beat 1.4s infinite;
 }
 
-@keyframes mug-heartbeat {
+@keyframes mug-symbol-beat {
   0% {
     transform: scale(var(--rest));
     animation-timing-function: cubic-bezier(0.3, 0, 0.5, 1);
@@ -108,7 +108,7 @@
   .mug:hover .mug__lift {
     transform: none;
   }
-  .mug__heart-beat {
+  .mug__symbol-beat {
     animation: none;
   }
 }

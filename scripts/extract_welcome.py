@@ -8,7 +8,7 @@ Outputs (public/assets/welcome/):
   welcome-bg.webp          background with the small title pixel removed
   title-pixel.webp         the small black pixel shape next to the title (animated in code)
   mug.webp                 coffee mug (portfolio easter egg), heart painted out
-  mug-heart.svg            the mug's pixel heart as a vector (beats in code)
+  mug-code.svg             pixel-art </> printed on the mug (beats in code)
   start-button.webp
   welcome-ext-top.webp     strips that continue the art's top / bottom edge,
   welcome-ext-bottom.webp  stretched to fill phones taller than the art
@@ -94,17 +94,40 @@ heart = (lab == 1 + np.argmax(st[1:, cv2.CC_STAT_AREA])).astype(np.uint8)
 ys, xs = np.where(heart)
 hx0, hy0, hx1, hy1 = xs.min(), ys.min(), xs.max() + 1, ys.max() + 1
 heart_rgb = np.median(src[heart == 1], axis=0)[::-1]
-S, pad = 8, 3
-patch = src[hy0 - pad:hy1 + pad, hx0 - pad:hx1 + pad].max(axis=2).astype(np.float32)
-up = cv2.resize(patch, None, fx=S, fy=S, interpolation=cv2.INTER_CUBIC)
-cs, _ = cv2.findContours((up < 128).astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-poly = cv2.approxPolyDP(max(cs, key=cv2.contourArea), 0.7 * S, True)[:, 0, :] / S - pad
 hw, hh = hx1 - hx0, hy1 - hy0
-pts = " ".join(f"{x:.2f},{y:.2f}" for x, y in poly)
-heart_fill = "#%02x%02x%02x" % tuple(int(v) for v in heart_rgb)
-with open(f"{OUT}/mug-heart.svg", "w") as f:
-    f.write(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 {hw + 2} {hh + 2}" '
-            f'shape-rendering="geometricPrecision"><polygon points="{pts}" fill="{heart_fill}"/></svg>\n')
+
+# The mug carries a pixel-art "</>" (replaces the heart; heart is still detected
+# above so it can be painted out of the mug layer). Square cells on an 18x9 grid,
+# solid #000, tilted like the mug's front face and centred where the heart was.
+CODE_GRID = [
+    "..........##......",
+    "...##.....##.##...",
+    "..##.....##...##..",
+    ".##......##....##.",
+    "##......##......##",
+    ".##.....##.....##.",
+    "..##...##.....##..",
+    "...##..##....##...",
+    "......##..........",
+]
+CELL, TILT = 3.9, -14.0  # source px per cell, degrees (negative = counter-clockwise)
+cols, rows = max(len(r) for r in CODE_GRID), len(CODE_GRID)
+gw, gh = cols * CELL, rows * CELL
+cx, cy = (hx0 + hx1) / 2, (hy0 + hy1) / 2
+SW, SH = 80, 56  # svg box (fits the tilted grid)
+sx0, sy0 = round(cx - SW / 2), round(cy - SH / 2)
+# one path (not separate rects) so tilted neighbouring cells have no seams
+cells = "".join(
+    f"M{c * CELL:g} {r * CELL:g}h{CELL:g}v{CELL:g}h-{CELL:g}z"
+    for r, line in enumerate(CODE_GRID) for c, ch in enumerate(line) if ch == "#"
+)
+ox, oy = cx - sx0 - gw / 2, cy - sy0 - gh / 2
+with open(f"{OUT}/mug-code.svg", "w") as f:
+    f.write(
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {SW} {SH}">'
+        f'<g fill="#000" transform="rotate({TILT} {SW / 2} {SH / 2}) translate({ox:.2f} {oy:.2f})">'
+        f'<path d="{cells}"/></g></svg>\n'
+    )
 
 # mug layer with the heart (and its light rim) painted out
 heart_hole = cv2.dilate(heart, np.ones((9, 9), np.uint8))
@@ -170,4 +193,4 @@ print(f"canvas {W}x{H}")
 print(f"title pixel x={px0} y={py0} w={px1 - px0} h={py1 - py0}")
 print(f"button {btn.size[0]}x{btn.size[1]}")
 print(f"mug x={mx0} y={my0} w={mx1 - mx0} h={my1 - my0}")
-print(f"heart svg box x={hx0 - 1} y={hy0 - 1} w={hw + 2} h={hh + 2} fill={heart_fill}")
+print(f"code symbol svg box x={sx0} y={sy0} w={SW} h={SH}")
