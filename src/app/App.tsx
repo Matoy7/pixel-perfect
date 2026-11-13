@@ -10,6 +10,7 @@ import { flowReducer, type FlowAction } from '../game/flow';
 import { clearLegacyProgress } from '../game/progress';
 import { LEVELS, TUTORIAL, puzzleAssets } from '../game/levels';
 import { preloadImages } from '../ui/preload';
+import { track } from '../analytics/track';
 
 export function App() {
   const [state, dispatch] = useReducer(flowReducer, undefined, () => ({
@@ -20,6 +21,16 @@ export function App() {
   const [storyFading, setStoryFading] = useState(false);
 
   useEffect(clearLegacyProgress, []);
+
+  // ---- anonymous analytics (never blocks the game; tutorial is not a level) ----
+  useEffect(() => track('visit'), []);
+  useEffect(() => {
+    if (state.screen.name === 'level') track('level_started', state.screen.index + 1);
+  }, [state.screen]);
+  const onLevelSolved = (index: number) => {
+    track('level_completed', index + 1);
+    if (index === LEVELS.length - 1) track('game_completed');
+  };
 
   /** Level-to-level transition through the found pixel (see PixelGate). */
   const [gate, setGate] = useState<{ origin: GateOrigin; phase: 'cover' | 'reveal' } | null>(null);
@@ -63,7 +74,12 @@ export function App() {
   // screen switches to the tutorial underneath it
   return (
     <div className="app">
-      {screen.name === 'welcome' && <WelcomeScreen onStart={() => dispatch({ type: 'PLAY' })} />}
+      {screen.name === 'welcome' && <WelcomeScreen
+          onStart={() => {
+            track('game_started');
+            dispatch({ type: 'PLAY' });
+          }}
+        />}
       {screen.name === 'tutorial' && (
         <TutorialScreen
           fromStory={screen.fromStory}
@@ -76,6 +92,7 @@ export function App() {
           key={screen.index}
           index={screen.index}
           revealed={gate === null}
+          onSolved={() => onLevelSolved(screen.index)}
           onDone={(rect) => {
             const next = LEVELS[screen.index + 1];
             passThroughPixel(rect, { type: 'LEVEL_DONE', index: screen.index }, next ? puzzleAssets(next) : []);

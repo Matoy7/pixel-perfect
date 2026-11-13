@@ -23,3 +23,7 @@ python3 scripts/extract_welcome.py art/welcome-original.png
 ```
 
 (requires `opencv-python`, `numpy`, `pillow`)
+
+## Player analytics (Supabase)
+Anonymous player tracking + admin dashboard (`/admin.html`).
+Setup: [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md). Without Supabase settings the game runs untracked.

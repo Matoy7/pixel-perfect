@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -36,4 +36,10 @@ function assetHashes(): Plugin {
 export default defineConfig({
   base: '/pixel-perfect/',
   plugins: [react(), assetHashes()],
+  build: {
+    rollupOptions: {
+      // the game + the admin analytics dashboard (/pixel-perfect/admin.html)
+      input: { main: resolve(__dirname, 'index.html'), admin: resolve(__dirname, 'admin.html') },
+    },
+  },
 });

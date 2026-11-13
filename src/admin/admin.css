@@ -1,0 +1,301 @@
+/* Admin dashboard – PIXEL PERFECT design language: lavender, white cards,
+   dark-purple ink, the game's yellow button, Secular One. */
+@font-face {
+  font-family: 'Secular One';
+  src: url('../assets/fonts/SecularOne-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+:root {
+  --bg: #ead9f2;
+  --ink: #3a2a52;
+  --muted: #7a6a94;
+  --line: #eadff0;
+  --track: #e3d6f0;
+  --fill: #7b5ea7;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Secular One', sans-serif;
+  font-synthesis: none;
+}
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+.adm {
+  max-width: 1180px;
+  overflow-x: hidden;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  display: grid;
+  gap: 16px;
+}
+.adm--center {
+  min-height: 100vh;
+  place-items: center;
+}
+.adm-card {
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 6px 20px rgba(60, 30, 80, 0.1);
+  padding: 18px 20px;
+  min-width: 0;
+}
+.adm-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 400;
+}
+.adm-h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 400;
+}
+.adm-muted {
+  color: var(--muted);
+}
+.adm-small {
+  font-size: 13px;
+}
+.adm-error {
+  margin: 0;
+  color: #b42318;
+  font-size: 14px;
+}
+.adm-num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* header */
+.adm-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+.adm-head__side {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* buttons (the game's yellow button) */
+.adm-btn {
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffd21f;
+  box-shadow: 0 3px 0 #e2a20b;
+  color: #2b1f12;
+  cursor: pointer;
+}
+.adm-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.adm-btn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #e2a20b;
+}
+.adm-btn--ghost {
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--line) inset;
+  padding: 7px 14px;
+  font-size: 14px;
+}
+
+/* login */
+.adm-login {
+  width: min(100%, 360px);
+  display: grid;
+  gap: 14px;
+}
+.adm-field {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+.adm-field input {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fbf8fd;
+  font-family: system-ui, sans-serif;
+}
+.adm-field input:focus {
+  outline: 2px solid var(--fill);
+  outline-offset: 1px;
+}
+
+/* stat tiles */
+.adm-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.adm-tile__value {
+  font-size: 34px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.adm-tile__label {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.adm-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 16px;
+}
+@media (max-width: 860px) {
+  .adm-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .adm {
+    padding: 14px 10px 32px;
+  }
+  .adm-card {
+    padding: 14px 12px;
+  }
+  .adm-barcell {
+    min-width: 120px;
+  }
+}
+
+/* tables */
+.adm-scroll {
+  overflow-x: auto;
+}
+.adm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.adm-table th {
+  text-align: start;
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.adm-table td {
+  padding: 8px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.adm-table tbody tr:hover td {
+  background: #faf6fc;
+}
+.adm-wide {
+  width: 50%;
+}
+.adm-barcell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 160px;
+}
+.adm-done {
+  color: #2f7a4a;
+}
+
+/* level bars: track = started (relative to the busiest level), fill = completed share */
+.adm-bar {
+  flex: 1;
+  min-width: 60px;
+}
+.adm-bar__track {
+  height: 12px;
+  border-radius: 4px;
+  background: var(--track);
+  overflow: hidden;
+  min-width: 2px;
+}
+.adm-bar__fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--fill);
+}
+.adm-legend {
+  display: flex;
+  gap: 14px;
+  margin: -4px 0 8px;
+  color: var(--muted);
+}
+.adm-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+.adm-swatch--track {
+  background: var(--track);
+}
+.adm-swatch--fill {
+  background: var(--fill);
+}
+
+/* activity feed */
+.adm-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+}
+.adm-feed li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+}
+.adm-feed b {
+  font-weight: 400;
+}
+
+/* sort toggle */
+.adm-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.adm-card__head .adm-h2 {
+  margin: 0;
+}
+.adm-seg {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: #f3ecf8;
+  margin-bottom: 8px;
+}
+.adm-seg button {
+  border: 0;
+  background: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.adm-seg button[aria-pressed='true'] {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(60, 30, 80, 0.15);
+}

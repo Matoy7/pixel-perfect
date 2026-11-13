@@ -9,16 +9,24 @@ type Props = {
   index: number;
   /** The level is fully on screen (transition finished): show its id card. */
   revealed: boolean;
+  /** Pixel found (level completed): fires immediately, before the success card. */
+  onSolved: () => void;
   /** Pixel found and the player tapped continue (with the pixel's on-screen rect). */
   onDone: (pixelRect: DOMRect) => void;
 };
 
-export function LevelScreen({ index, revealed, onDone }: Props) {
+export function LevelScreen({ index, revealed, onSolved, onDone }: Props) {
   const [found, setFound] = useState<DOMRect | null>(null);
   const n = index + 1;
   return (
     <section className="level" aria-label={copy.level.label(n)}>
-      <PuzzleScene config={LEVELS[index]} onFound={setFound} />
+      <PuzzleScene
+        config={LEVELS[index]}
+        onFound={(rect) => {
+          setFound(rect);
+          onSolved();
+        }}
+      />
       {!found && (
         <LevelIdCard show={revealed} place={copy.level.places[index] ?? ''} number={copy.level.number(n)} />
       )}
