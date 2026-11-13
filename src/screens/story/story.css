@@ -111,8 +111,9 @@
 .story__skip {
   position: absolute;
   z-index: 5;
-  top: calc(env(safe-area-inset-top) + 12px);
-  left: 12px; /* RTL: the end corner */
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 16px);
+  transform: translateX(-50%);
   margin: 0;
   padding: 7px 14px;
   border: 0;

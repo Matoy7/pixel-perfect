@@ -14,22 +14,19 @@ export function App() {
   // persist progress whenever it changes
   useEffect(() => saveProgress(state.progress), [state.progress]);
 
-  // first-time players will see the story next: fetch + decode it while they
-  // are still on the welcome screen
+  // the story comes right after PLAY: fetch + decode it while the player is
+  // still on the welcome screen
   useEffect(() => {
     if (state.screen.name !== 'welcome') return;
     const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 300));
     idle(() => void preloadStory());
   }, [state.screen.name]);
 
-  const { screen, progress } = state;
+  const { screen } = state;
   return (
     <div className="app">
       {screen.name === 'welcome' && (
-        <WelcomeScreen
-          onStart={() => dispatch({ type: 'PLAY' })}
-          onReplayStory={progress.storySeen ? () => dispatch({ type: 'REPLAY_STORY' }) : null}
-        />
+        <WelcomeScreen onStart={() => dispatch({ type: 'PLAY' })} />
       )}
       {screen.name === 'story' && <StoryScreen onDone={() => dispatch({ type: 'STORY_DONE' })} />}
       {screen.name === 'tutorial' && (

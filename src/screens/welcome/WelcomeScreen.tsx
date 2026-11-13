@@ -9,13 +9,11 @@ import './welcome.css';
 
 type Props = {
   onStart: () => void;
-  /** Returning players: offer to watch the story again (null = first visit). */
-  onReplayStory: (() => void) | null;
 };
 
 const PRESS_RELEASE_MS = 140; // let the press animation read before leaving the screen
 
-export function WelcomeScreen({ onStart, onReplayStory }: Props) {
+export function WelcomeScreen({ onStart }: Props) {
   const [pressed, setPressed] = useState(false);
   const bg = asset('assets/welcome/welcome-bg.webp');
 
@@ -67,11 +65,6 @@ export function WelcomeScreen({ onStart, onReplayStory }: Props) {
           />
         </button>
       </ExtendedArt>
-      {onReplayStory && (
-        <button type="button" className="welcome__replay" onClick={onReplayStory}>
-          {copy.welcome.replayStory}
-        </button>
-      )}
     </main>
   );
 }

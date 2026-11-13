@@ -27,15 +27,18 @@ export type Scene = {
 };
 
 /**
- * ~6.25s + 0.3s fade-out. Uneven durations = hand-edited rhythm; the cut into the fight
- * is quicker, Yotam's reaction settles, the pixel discovery holds.
+ * 5 x 1.5s = 7.5s + 0.3s fade-out. The cut into the fight is still the
+ * quickest crossfade.
  */
+/** Every shot is on screen for 1.5s. */
+export const SHOT_MS = 1500;
+
 export const SCENES: Scene[] = [
-  { id: 1, duration: 1450, fadeIn: 300, camera: 'zoomIn', jitter: false }, // peaceful moment
-  { id: 2, duration: 850, fadeIn: 260, camera: 'panLeft', jitter: true }, // Pigmi spots the yarn
-  { id: 3, duration: 700, fadeIn: 220, camera: 'zoomOut', jitter: true }, // close-up: wide eyes
-  { id: 4, duration: 1200, fadeIn: 120, camera: 'still', jitter: true }, // the fight (live cloud)
-  { id: 5, duration: 2050, fadeIn: 260, camera: 'discover', jitter: true }, // "פיגמי! מה עשית?!" → the pixel
+  { id: 1, duration: SHOT_MS, fadeIn: 300, camera: 'zoomIn', jitter: false }, // peaceful moment
+  { id: 2, duration: SHOT_MS, fadeIn: 260, camera: 'panLeft', jitter: true }, // Pigmi spots the yarn
+  { id: 3, duration: SHOT_MS, fadeIn: 220, camera: 'zoomOut', jitter: true }, // close-up: wide eyes
+  { id: 4, duration: SHOT_MS, fadeIn: 120, camera: 'still', jitter: true }, // the fight (live cloud)
+  { id: 5, duration: SHOT_MS, fadeIn: 260, camera: 'discover', jitter: true }, // "פיגמי! מה עשית?!" → the pixel
 ];
 
 export const OUTRO_FADE_MS = 300;

@@ -6,27 +6,6 @@
   background: #ead9f2;
 }
 
-/* returning players only: quiet text link, bottom of the screen */
-.welcome__replay {
-  position: absolute;
-  z-index: 2;
-  left: 50%;
-  bottom: calc(env(safe-area-inset-bottom) + 10px);
-  transform: translateX(-50%);
-  margin: 0;
-  padding: 10px 16px;
-  border: 0;
-  background: none;
-  font: inherit;
-  font-size: 14px;
-  color: #5b4a7a;
-  opacity: 0.75;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
 /* ---- Start button ---- */
 .start-button {
   position: absolute;
