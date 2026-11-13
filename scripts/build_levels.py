@@ -48,6 +48,17 @@ def paint_out_rows(img, box, pad=3):
     img[y:y + h, x - pad:x + w + pad] = cv2.GaussianBlur(patch, (3, 3), 0)[1:-1]
 
 
+def darken_dark(img, box, factor, thresh=90):
+    """Darken the dark pixels inside box (x, y, w, h) by factor, keeping their
+    relative shading; bright pixels (frames, highlights) are left alone and
+    anti-aliased edges are blended."""
+    x, y, w, h = box
+    roi = img[y:y + h, x:x + w].astype(np.float32)
+    mx = roi.max(axis=2)
+    a = np.clip((thresh - mx) / 30, 0, 1)[..., None]  # 1 = dark grille, 0 = bright frame
+    img[y:y + h, x:x + w] = (roi * (1 - a) + roi * factor * a).clip(0, 255).astype(np.uint8)
+
+
 # Edge-strip style per level (default: flat dominant colour of the edge)
 STRIPS = {
     # Level 4: busy edges (tree, sky, crane / flowers) → light tones: pale sky above, pale street below
@@ -62,6 +73,8 @@ FIXES = {
     "1": lambda img: recolor_dark(img, (541, 595, 22, 21), dark_bgr=(18, 160, 222), light_bgr=(40, 214, 252)),
     # Level 3: the black label on the yellow suitcase (carousel) looked like the pixel → suitcase yellow
     "3": lambda img: paint_out_rows(img, (770, 1080, 19, 22)),
+    # Level 5: the speaker grille made near-black so the pixel blends into it
+    "5": lambda img: darken_dark(img, (193, 1120, 36, 35), factor=0.18),
 }
 os.makedirs(OUT, exist_ok=True)
 
