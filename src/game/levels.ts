@@ -82,6 +82,9 @@ export const LEVELS: PuzzleConfig[] = [
   // Level 6 – the safari penguin exhibit: the black square inside the rhino on the
   // Safari sign, right side (art square x 959–981, y 689–709)
   level(6, { width: 1086, height: 1448 }, { x: 970, y: 699 }),
+  // Level 7 – the post office: the black box on the red shelving, right edge, next to
+  // its white label (box front x 1019–1062, y 398–440; label x 1027–1041)
+  level(7, { width: 1086, height: 1448 }, { x: 1054, y: 419 }),
 ];
 
 export const puzzleAssets = (c: PuzzleConfig) => [...new Set([c.image, c.imageClean, c.extTop, c.extBottom])];
