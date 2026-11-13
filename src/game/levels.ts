@@ -64,6 +64,8 @@ const level = (n: number, canvas: Size, center: { x: number; y: number }): Puzzl
 export const LEVELS: PuzzleConfig[] = [
   // Level 1 – the supermarket: on the phone of the man in the yellow shirt
   level(1, { width: 1087, height: 1447 }, { x: 164, y: 668 }),
+  // Level 2 – the office: meeting-room board, the smallest bar of the chart
+  level(2, { width: 1086, height: 1448 }, { x: 892, y: 226 }),
 ];
 
 export const puzzleAssets = (c: PuzzleConfig) => [...new Set([c.image, c.imageClean, c.extTop, c.extBottom])];
