@@ -3,7 +3,7 @@ import type React from 'react';
 import { ExtendedArt } from '../ui/ExtendedArt';
 import { boxToPercent } from '../ui/geometry';
 import { clientToSource, isHit } from '../game/hitTest';
-import { pixelBox, type PuzzleConfig } from '../game/levels';
+import { PIXEL_COLOR, pixelBox, type PuzzleConfig } from '../game/levels';
 import './puzzle.css';
 
 const MAX_ZOOM = 4;
@@ -241,10 +241,7 @@ export function PuzzleScene({ config, intro, onFound }: Props) {
         >
           {/* revealed under the burst: the art without its pixel */}
           <img className="puzzle__clean" src={config.imageClean} alt="" draggable={false} />
-          <div
-            className="puzzle__pixel"
-            style={{ ...pixelPos, ['--pixel-color' as string]: config.pixelColor ?? '#000' }}
-          >
+          <div className="puzzle__pixel" style={{ ...pixelPos, ['--pixel-color' as string]: PIXEL_COLOR }}>
             <div className="puzzle__pixel-core" />
             {found &&
               Array.from({ length: FRAGMENTS }, (_, i) => {

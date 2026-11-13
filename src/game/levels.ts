@@ -3,6 +3,8 @@ import type { Box, Size } from '../ui/geometry';
 
 /** Visible size of a level's pixel: exactly 8×8 CSS px on every device (at fit). */
 export const LEVEL_PIXEL_CSS = 8;
+/** The one pixel colour, everywhere in the game (no per-level override). */
+export const PIXEL_COLOR = '#000000';
 
 /**
  * Where the pixel is and how big it is drawn:
@@ -28,8 +30,6 @@ export type PuzzleConfig = {
   extTop: string;
   extBottom: string;
   pixel: PixelSpec;
-  /** Pixel colour (default solid black #000000). */
-  pixelColor?: string;
   /** Soften the art's top/bottom edges into the edge strips (art cut at its edges). */
   feather?: boolean;
 };
@@ -48,12 +48,7 @@ export const TUTORIAL: PuzzleConfig = {
 };
 
 /** Level art is clean (no pixel baked in): the game draws the pixel. */
-const level = (
-  n: number,
-  canvas: Size,
-  center: { x: number; y: number },
-  opts: { color?: string } = {},
-): PuzzleConfig => {
+const level = (n: number, canvas: Size, center: { x: number; y: number }): PuzzleConfig => {
   const img = asset(`assets/levels/level-${n}.webp`);
   return {
     id: `level-${n}`,
@@ -63,7 +58,6 @@ const level = (
     extTop: asset(`assets/levels/level-${n}-ext-top.webp`),
     extBottom: asset(`assets/levels/level-${n}-ext-bottom.webp`),
     pixel: { kind: 'css', center, size: LEVEL_PIXEL_CSS },
-    pixelColor: opts.color,
     feather: true,
   };
 };
@@ -74,9 +68,8 @@ export const LEVELS: PuzzleConfig[] = [
   level(1, { width: 1087, height: 1447 }, { x: 164, y: 668 }),
   // Level 2 – the office: meeting-room board, the smallest bar of the chart
   level(2, { width: 1086, height: 1448 }, { x: 892, y: 226 }),
-  // Level 3 – the airport: one of the control tower's front windows (window x 363–385,
-  // y 86–115), dark brown so it blends with the window glass
-  level(3, { width: 1086, height: 1448 }, { x: 374, y: 100.5 }, { color: '#3B2418' }),
+  // Level 3 – the airport: one of the control tower's front windows (window x 363–385, y 86–115)
+  level(3, { width: 1086, height: 1448 }, { x: 374, y: 100.5 }),
 ];
 
 export const puzzleAssets = (c: PuzzleConfig) => [...new Set([c.image, c.imageClean, c.extTop, c.extBottom])];

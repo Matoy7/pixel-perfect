@@ -27,7 +27,7 @@
   opacity: 1;
 }
 
-/* ---- the pixel: perfect square, solid colour (#000 unless the level sets one), crisp ---- */
+/* ---- the pixel: perfect square, solid black (PIXEL_COLOR), crisp ---- */
 .puzzle__pixel {
   position: absolute;
   container-type: inline-size; /* 1cqw = 1% of the pixel's size (fragments) */
