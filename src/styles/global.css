@@ -1,3 +1,16 @@
+/*
+ * Typography: Secular One (the only font of the game). It ships a single
+ * weight (Regular 400), so all text uses 400 and the browser is told never to
+ * fake bold/italic. Bundled locally (src/assets/fonts), no external service.
+ */
+@font-face {
+  font-family: 'Secular One';
+  src: url('../assets/fonts/SecularOne-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block; /* never show a fallback font flash */
+}
+
 :root {
   /* stable visible height on mobile (dynamic toolbars) */
   --app-height: 100vh;
@@ -30,11 +43,21 @@ body {
   user-select: none;
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
-  font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  font-family: 'Secular One', sans-serif;
+  font-weight: 400;
+  font-synthesis: none; /* one real weight only: no faux bold / italic */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 img {
   -webkit-user-drag: none;
+}
+
+/* form controls don't inherit fonts by default */
+button,
+input {
+  font-family: inherit;
 }
 
 /* Mobile-only product: on wide screens show the phone-width column only. */
