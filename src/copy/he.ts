@@ -3,5 +3,14 @@ export const copy = {
   welcome: {
     start: 'התחלת משחק',
     portfolio: 'לתיק העבודות של יותם אלירז (נפתח בכרטיסייה חדשה)',
+    replayStory: 'לצפייה בסיפור שוב',
+  },
+  story: {
+    skip: 'דילוג',
+    label: 'הסיפור: פיגמי והפיקסל השחור',
+  },
+  tutorialPlaceholder: {
+    title: 'כאן יגיע שלב האימון',
+    back: 'חזרה למסך הפתיחה',
   },
 } as const;

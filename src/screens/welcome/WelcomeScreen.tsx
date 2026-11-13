@@ -1,19 +1,21 @@
 import { useState } from 'react';
-import type React from 'react';
 import { START_BUTTON_BOX, WELCOME_CANVAS, boxToPercent } from './layout';
 import { asset } from '../../app/asset';
 import { TitlePixel } from './TitlePixel';
 import { CoffeeMug } from './CoffeeMug';
 import { copy } from '../../copy/he';
+import { ExtendedArt } from '../../ui/ExtendedArt';
 import './welcome.css';
 
 type Props = {
   onStart: () => void;
+  /** Returning players: offer to watch the story again (null = first visit). */
+  onReplayStory: (() => void) | null;
 };
 
 const PRESS_RELEASE_MS = 140; // let the press animation read before leaving the screen
 
-export function WelcomeScreen({ onStart }: Props) {
+export function WelcomeScreen({ onStart, onReplayStory }: Props) {
   const [pressed, setPressed] = useState(false);
   const bg = asset('assets/welcome/welcome-bg.webp');
 
@@ -23,22 +25,14 @@ export function WelcomeScreen({ onStart }: Props) {
   };
 
   return (
-    <main
-      className="welcome"
-      style={
-        {
-          '--art-w': WELCOME_CANVAS.width,
-          '--art-h': WELCOME_CANVAS.height,
-        } as React.CSSProperties
-      }
-    >
-      <div
-        className="welcome__ext"
-        aria-hidden="true"
-        style={{ backgroundImage: `url(${asset('assets/welcome/welcome-ext-top.webp')})` }}
-      />
-      <div className="welcome__stage">
-        <img className="welcome__art" src={bg} alt="" draggable={false} />
+    <main className="welcome">
+      <ExtendedArt
+        src={bg}
+        extTop={asset('assets/welcome/welcome-ext-top.webp')}
+        extBottom={asset('assets/welcome/welcome-ext-bottom.webp')}
+        canvas={WELCOME_CANVAS}
+        featherTop
+      >
         <TitlePixel />
         <CoffeeMug />
         <h1 className="visually-hidden">PIXEL PERFECT</h1>
@@ -72,12 +66,12 @@ export function WelcomeScreen({ onStart }: Props) {
             draggable={false}
           />
         </button>
-      </div>
-      <div
-        className="welcome__ext"
-        aria-hidden="true"
-        style={{ backgroundImage: `url(${asset('assets/welcome/welcome-ext-bottom.webp')})` }}
-      />
+      </ExtendedArt>
+      {onReplayStory && (
+        <button type="button" className="welcome__replay" onClick={onReplayStory}>
+          {copy.welcome.replayStory}
+        </button>
+      )}
     </main>
   );
 }

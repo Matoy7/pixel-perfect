@@ -1,0 +1,54 @@
+.xart {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  /* contain: as wide as possible without exceeding the height */
+  --stage-w: min(100%, calc(var(--app-height) * var(--art-w) / var(--art-h)));
+  --stage-h: calc(var(--stage-w) * var(--art-h) / var(--art-w));
+  --feather: 0px;
+}
+
+.xart--feather {
+  --feather: calc(var(--stage-h) * 0.04);
+}
+
+/* Phones are taller than the art: these strips continue its top/bottom edge. */
+.xart__ext {
+  flex: 1 1 0;
+  align-self: stretch;
+  min-height: 0;
+  margin: -1px 0; /* tuck under the art edge: no hairline seam */
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+/* top strip runs underneath the feathered edge so it blends into the strip */
+.xart__ext:first-child {
+  margin-bottom: calc(-1px - var(--feather));
+}
+
+.xart__stage {
+  position: relative;
+  flex: none;
+  width: var(--stage-w);
+  aspect-ratio: var(--art-w) / var(--art-h);
+  z-index: 1;
+  /* --u = one source-image pixel at the current display size */
+  container-type: inline-size;
+  --u: calc(100cqw / var(--art-w));
+}
+
+.xart--feather .xart__stage {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--feather));
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--feather));
+}
+
+.xart__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}

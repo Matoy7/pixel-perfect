@@ -1,0 +1,140 @@
+.story {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #f8edf2; /* matches the scenes' wall */
+  transition: opacity var(--outro) ease-in;
+}
+.story--leaving {
+  opacity: 0;
+}
+
+/* ---- shots: stacked, the newest fades in over the previous one ---- */
+.shot,
+.shot__jitter,
+.shot__camera {
+  position: absolute;
+  inset: 0;
+}
+
+.shot--entering {
+  animation: story-fade-in var(--fade) ease-out both;
+}
+@keyframes story-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* tiny hand-placed frame shifts as a shot lands (stop-motion feel) */
+.shot__jitter--on {
+  animation: story-jitter 300ms steps(1, end) both;
+}
+@keyframes story-jitter {
+  0% {
+    transform: translate(1.5px, -1px);
+  }
+  34% {
+    transform: translate(-1px, 1px);
+  }
+  67% {
+    transform: translate(0.5px, 0);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* ---- camera moves (very subtle Ken Burns), over the whole shot ---- */
+.shot__camera {
+  will-change: transform;
+  animation-duration: var(--dur);
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.shot__camera--zoomIn {
+  animation-name: cam-zoom-in;
+}
+.shot__camera--zoomOut {
+  animation-name: cam-zoom-out;
+}
+.shot__camera--panLeft {
+  animation-name: cam-pan-left;
+}
+.shot__camera--discover {
+  animation-name: cam-discover;
+  animation-timing-function: linear;
+}
+
+@keyframes cam-zoom-in {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.045);
+  }
+}
+@keyframes cam-zoom-out {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes cam-pan-left {
+  from {
+    transform: scale(1.03) translateX(0.8%);
+  }
+  to {
+    transform: scale(1.03) translateX(-0.8%);
+  }
+}
+/* settle on Yotam's reaction, then a slow push centred on the monitor pixel.
+   Max 4%: more would crop the caption box at the screen edges. */
+@keyframes cam-discover {
+  0%,
+  45% {
+    transform: scale(1);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.3, 1);
+  }
+  100% {
+    transform: scale(1.04);
+  }
+}
+
+/* ---- skip ---- */
+.story__skip {
+  position: absolute;
+  z-index: 5;
+  top: calc(env(safe-area-inset-top) + 12px);
+  left: 12px; /* RTL: the end corner */
+  margin: 0;
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(40, 28, 60, 0.38);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.2;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: story-fade-in 400ms 300ms ease-out both;
+}
+.story__skip:active {
+  background: rgba(40, 28, 60, 0.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot__jitter--on,
+  .shot__camera {
+    animation: none;
+  }
+}

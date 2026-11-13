@@ -1,6 +1,6 @@
 /*
  * Title pixel "smoke puff" loop.
- * Units: --u = one source-image pixel (set on .welcome__stage), so the motion
+ * Units: --u = one source-image pixel (set on .xart__stage), so the motion
  * scales exactly with the artwork on every screen.
  *
  * Timeline (one 3.6s cycle, seamless: 0% === 100%):

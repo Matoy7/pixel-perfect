@@ -1,0 +1,142 @@
+/*
+ * Live dust cloud. --u = one source pixel (from .xart__stage), so motion scales
+ * with the art. Different durations/delays per layer + uneven keyframe spacing
+ * = chaotic, never-repeating-in-sync tumbling.
+ */
+.fight,
+.fight img {
+  position: absolute;
+  pointer-events: none;
+}
+.fight {
+  inset: 0;
+}
+.fight img {
+  display: block;
+  will-change: transform;
+}
+
+/* cloud body: irregular breathing, slightly more horizontal than vertical */
+.fight__cloud {
+  animation: fight-breathe 1.55s infinite;
+}
+@keyframes fight-breathe {
+  0% {
+    transform: scale(1, 1);
+    animation-timing-function: cubic-bezier(0.3, 0.6, 0.4, 1);
+  }
+  17% {
+    transform: scale(1.028, 1.016) translateX(calc(var(--u) * 1));
+    animation-timing-function: ease-in-out;
+  }
+  29% {
+    transform: scale(1.008, 1.004);
+    animation-timing-function: cubic-bezier(0.3, 0.6, 0.4, 1);
+  }
+  46% {
+    transform: scale(1.032, 1.024) translateX(calc(var(--u) * -1.5));
+    animation-timing-function: ease-in-out;
+  }
+  58% {
+    transform: scale(1.012, 1.008);
+    animation-timing-function: ease-in-out;
+  }
+  77% {
+    transform: scale(1.02, 1.03) translateY(calc(var(--u) * -1));
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+/* edge sections: push out along their normal; two rhythm shapes (a/b) */
+.fight__lobe {
+  --push: calc(var(--u) * var(--amp));
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+.fight__lobe--a {
+  animation-name: fight-lobe-a;
+}
+.fight__lobe--b {
+  animation-name: fight-lobe-b;
+}
+
+@keyframes fight-lobe-a {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  14% {
+    /* sudden bulge … */
+    transform: translate(calc(var(--nx) * var(--push)), calc(var(--ny) * var(--push))) scale(1.06)
+      rotate(var(--rot));
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  30% {
+    /* … quickly settles */
+    transform: translate(calc(var(--nx) * var(--push) * 0.15), calc(var(--ny) * var(--push) * 0.15))
+      scale(1.01);
+  }
+  62% {
+    transform: translate(calc(var(--nx) * var(--push) * 0.55), calc(var(--ny) * var(--push) * 0.55))
+      scale(1.03) rotate(calc(var(--rot) * -0.6));
+  }
+  80% {
+    transform: translate(calc(var(--nx) * var(--push) * 0.2), calc(var(--ny) * var(--push) * 0.2))
+      scale(1.005);
+  }
+}
+
+@keyframes fight-lobe-b {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  26% {
+    transform: translate(calc(var(--nx) * var(--push) * 0.6), calc(var(--ny) * var(--push) * 0.6))
+      scale(1.035) rotate(calc(var(--rot) * -1));
+  }
+  41% {
+    transform: translate(calc(var(--nx) * var(--push) * 0.1), calc(var(--ny) * var(--push) * 0.1))
+      scale(1.005);
+  }
+  55% {
+    /* the big one */
+    transform: translate(calc(var(--nx) * var(--push)), calc(var(--ny) * var(--push))) scale(1.065)
+      rotate(var(--rot));
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  72% {
+    transform: translate(calc(var(--nx) * var(--push) * 0.25), calc(var(--ny) * var(--push) * 0.25))
+      scale(1.015);
+  }
+}
+
+/* small side puffs: bob and tilt */
+.fight__puff {
+  animation-name: fight-puff;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+@keyframes fight-puff {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  33% {
+    transform: translate(calc(var(--dir) * var(--u) * 3), calc(var(--u) * -3))
+      rotate(calc(var(--dir) * 7deg)) scale(1.06);
+  }
+  66% {
+    transform: translate(calc(var(--dir) * var(--u) * -1), calc(var(--u) * 1.5))
+      rotate(calc(var(--dir) * -4deg)) scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fight img {
+    animation: none !important;
+  }
+}

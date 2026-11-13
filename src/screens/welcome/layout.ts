@@ -1,3 +1,5 @@
+import { boxToPercent as toPercent, type Box, type Size } from '../../ui/geometry';
+
 // Geometry of the welcome artwork, in source-image pixels.
 // Boxes come from scripts/extract_welcome.py.
 export const WELCOME_CANVAS = { width: 972, height: 1619 } as const;
@@ -14,14 +16,7 @@ export const MUG_SYMBOL_BOX = { x: 161, y: 1098, width: 80, height: 56 } as cons
 
 export const PORTFOLIO_URL = 'https://yotameliraz.co.il';
 
-type Box ={ x: number; y: number; width: number; height: number };
-
-/** Source-pixel box → CSS percentages of the canvas, so it scales with the art. */
-export function boxToPercent(box: Box, canvas: { width: number; height: number } = WELCOME_CANVAS) {
-  return {
-    left: `${(box.x / canvas.width) * 100}%`,
-    top: `${(box.y / canvas.height) * 100}%`,
-    width: `${(box.width / canvas.width) * 100}%`,
-    height: `${(box.height / canvas.height) * 100}%`,
-  };
+/** Source-pixel box → CSS percentages of the welcome canvas. */
+export function boxToPercent(box: Box, canvas: Size = WELCOME_CANVAS) {
+  return toPercent(box, canvas);
 }

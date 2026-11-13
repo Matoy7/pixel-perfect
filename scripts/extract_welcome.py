@@ -20,6 +20,8 @@ import cv2
 import numpy as np
 from PIL import Image
 
+from artlib import edge_strip
+
 ART = "art"
 OUT = "public/assets/welcome"
 
@@ -174,18 +176,6 @@ btn = Image.open(f"{ART}/start-button.png")
 btn.save(f"{OUT}/start-button.webp", "WEBP", lossless=True, method=6)
 
 # ---- edge extensions ----------------------------------------------------------
-def edge_strip(rows, toward_top):
-    edge = rows.astype(np.float32).mean(axis=0, keepdims=True)  # 1 x W x 3
-    near = cv2.GaussianBlur(edge, (0, 0), sigmaX=16, sigmaY=0.1)
-    far = cv2.GaussianBlur(edge, (0, 0), sigmaX=160, sigmaY=0.1)
-    n = 96
-    t = np.linspace(0, 1, n, dtype=np.float32)[:, None, None]  # 0 = at art edge
-    t = t * t * (3 - 2 * t)
-    strip = near * (1 - t) + far * t
-    if toward_top:
-        strip = strip[::-1]
-    return Image.fromarray(cv2.cvtColor(strip.clip(0, 255).astype(np.uint8), cv2.COLOR_BGR2RGB))
-
 edge_strip(bg[:6], True).save(f"{OUT}/welcome-ext-top.webp", "WEBP", quality=92)
 edge_strip(bg[-6:], False).save(f"{OUT}/welcome-ext-bottom.webp", "WEBP", quality=92)
 
