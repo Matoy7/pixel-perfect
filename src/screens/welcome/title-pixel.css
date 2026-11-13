@@ -1,0 +1,175 @@
+/*
+ * Title pixel "smoke puff" loop.
+ * Units: --u = one source-image pixel (set on .welcome__stage), so the motion
+ * scales exactly with the artwork on every screen.
+ *
+ * Timeline (one 3.6s cycle, seamless: 0% === 100%):
+ *   0–8%    rest at the original spot
+ *   8–40%   pixel drifts up-right on a curve (x eases in, y eases out)
+ *   18/26/34%  fragments 1/2/3 break off from the pixel's current position,
+ *              float up-right and fade out over 30% of the cycle
+ *   40–72%  pixel glides back to its exact original position
+ *   72–100% rest
+ */
+.title-pixel {
+  position: absolute;
+  pointer-events: none;
+  --cycle: 3.6s;
+}
+
+.title-pixel__x,
+.title-pixel__y,
+.title-pixel img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+.title-pixel img {
+  display: block;
+}
+
+.title-pixel__x {
+  animation: title-pixel-x var(--cycle) infinite;
+}
+.title-pixel__y {
+  animation: title-pixel-y var(--cycle) infinite;
+}
+
+@keyframes title-pixel-x {
+  0%,
+  8% {
+    transform: translateX(0);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.9, 0.6); /* ease-in */
+  }
+  40% {
+    transform: translateX(calc(var(--u) * 10));
+    animation-timing-function: cubic-bezier(0.45, 0, 0.35, 1); /* ease-in-out */
+  }
+  72%,
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes title-pixel-y {
+  0%,
+  8% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.1, 0.4, 0.55, 1); /* ease-out */
+  }
+  40% {
+    transform: translateY(calc(var(--u) * -14));
+    animation-timing-function: cubic-bezier(0.45, 0, 0.35, 1);
+  }
+  72%,
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* ---- fragments ---- */
+.title-pixel__frag {
+  position: absolute;
+  /* emerge from the top square of the shape (centre at 27.6, 10.5 source px) */
+  left: calc(var(--u) * (27.6 - var(--s) / 2));
+  top: calc(var(--u) * (10.5 - var(--s) / 2));
+  width: calc(var(--u) * var(--s));
+  height: calc(var(--u) * var(--s));
+  background: #000;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: var(--name) var(--cycle) infinite;
+}
+.title-pixel__frag--1 {
+  --s: 10;
+  --name: title-pixel-frag-1;
+}
+.title-pixel__frag--2 {
+  --s: 9;
+  --name: title-pixel-frag-2;
+}
+.title-pixel__frag--3 {
+  --s: 8;
+  --name: title-pixel-frag-3;
+}
+
+/* start = pixel offset at the moment of release; then float up-right and fade */
+@keyframes title-pixel-frag-1 {
+  0%,
+  17.9% {
+    opacity: 0;
+    transform: translate(calc(var(--u) * 1.4), calc(var(--u) * -6.6));
+  }
+  18% {
+    opacity: 1;
+    transform: translate(calc(var(--u) * 1.4), calc(var(--u) * -6.6));
+    animation-timing-function: cubic-bezier(0.25, 0.6, 0.45, 1);
+  }
+  30% {
+    opacity: 0.95;
+    transform: translate(calc(var(--u) * 8.4), calc(var(--u) * -18.6)) scale(0.85);
+    animation-timing-function: cubic-bezier(0.35, 0, 0.65, 1);
+  }
+  50%,
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--u) * 21.4), calc(var(--u) * -28.6)) scale(0.5);
+  }
+}
+
+@keyframes title-pixel-frag-2 {
+  0%,
+  25.9% {
+    opacity: 0;
+    transform: translate(calc(var(--u) * 3.8), calc(var(--u) * -10.6));
+  }
+  26% {
+    opacity: 1;
+    transform: translate(calc(var(--u) * 3.8), calc(var(--u) * -10.6));
+    animation-timing-function: cubic-bezier(0.25, 0.6, 0.45, 1);
+  }
+  38% {
+    opacity: 0.95;
+    transform: translate(calc(var(--u) * 10.8), calc(var(--u) * -22.6)) scale(0.85);
+    animation-timing-function: cubic-bezier(0.35, 0, 0.65, 1);
+  }
+  58%,
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--u) * 23.8), calc(var(--u) * -32.6)) scale(0.5);
+  }
+}
+
+@keyframes title-pixel-frag-3 {
+  0%,
+  33.9% {
+    opacity: 0;
+    transform: translate(calc(var(--u) * 7), calc(var(--u) * -13.2));
+  }
+  34% {
+    opacity: 1;
+    transform: translate(calc(var(--u) * 7), calc(var(--u) * -13.2));
+    animation-timing-function: cubic-bezier(0.25, 0.6, 0.45, 1);
+  }
+  46% {
+    opacity: 0.95;
+    transform: translate(calc(var(--u) * 14), calc(var(--u) * -25.2)) scale(0.85);
+    animation-timing-function: cubic-bezier(0.35, 0, 0.65, 1);
+  }
+  66%,
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--u) * 27), calc(var(--u) * -35.2)) scale(0.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title-pixel__x,
+  .title-pixel__y,
+  .title-pixel__frag {
+    animation: none;
+  }
+}

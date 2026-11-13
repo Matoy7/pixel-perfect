@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import type React from 'react';
 import { START_BUTTON_BOX, WELCOME_CANVAS, boxToPercent } from './layout';
 import { asset } from '../../app/asset';
+import { TitlePixel } from './TitlePixel';
 import { copy } from '../../copy/he';
 import './welcome.css';
 
@@ -20,22 +22,28 @@ export function WelcomeScreen({ onStart }: Props) {
   };
 
   return (
-    <main className="welcome">
+    <main
+      className="welcome"
+      style={
+        {
+          '--art-w': WELCOME_CANVAS.width,
+          '--art-h': WELCOME_CANVAS.height,
+        } as React.CSSProperties
+      }
+    >
       <div
         className="welcome__ext"
         aria-hidden="true"
         style={{ backgroundImage: `url(${asset('assets/welcome/welcome-ext-top.webp')})` }}
       />
-      <div
-        className="welcome__stage"
-        style={{ aspectRatio: `${WELCOME_CANVAS.width} / ${WELCOME_CANVAS.height}` }}
-      >
+      <div className="welcome__stage">
         <img className="welcome__art" src={bg} alt="" draggable={false} />
+        <TitlePixel />
         <h1 className="visually-hidden">PIXEL PERFECT</h1>
         <button
           type="button"
           className={`start-button${pressed ? ' is-pressed' : ''}`}
-          style={boxToPercent(START_BUTTON_BOX, WELCOME_CANVAS)}
+          style={boxToPercent(START_BUTTON_BOX)}
           aria-label={copy.welcome.start}
           onPointerDown={(e) => {
             e.currentTarget.setPointerCapture(e.pointerId);
