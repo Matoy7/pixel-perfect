@@ -1,31 +1,11 @@
 /**
- * Player progress, persisted in localStorage. Every read/write is guarded:
- * storage can be unavailable (private mode, blocked) and the game must still run.
+ * The game saves nothing between visits: every player starts from the
+ * beginning. This removes progress older versions stored on the device.
  */
-const KEY = 'pixel-perfect:progress:v1';
-
-export type Progress = {
-  /** Story intro watched (or skipped) at least once. (Recorded only; the story plays on every PLAY.) */
-  storySeen: boolean;
-  /** Number of numbered levels completed (the tutorial never counts). Next level = this index. */
-  levelsCompleted: number;
-};
-
-const DEFAULTS: Progress = { storySeen: false, levelsCompleted: 0 };
-
-export function loadProgress(): Progress {
+export function clearLegacyProgress(): void {
   try {
-    const raw = window.localStorage.getItem(KEY);
-    return raw ? { ...DEFAULTS, ...(JSON.parse(raw) as Partial<Progress>) } : { ...DEFAULTS };
+    window.localStorage.removeItem('pixel-perfect:progress:v1');
   } catch {
-    return { ...DEFAULTS };
-  }
-}
-
-export function saveProgress(p: Progress): void {
-  try {
-    window.localStorage.setItem(KEY, JSON.stringify(p));
-  } catch {
-    /* storage unavailable: progress lives for this session only */
+    /* storage unavailable: nothing to clear */
   }
 }

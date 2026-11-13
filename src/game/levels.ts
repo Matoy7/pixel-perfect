@@ -32,7 +32,7 @@ export type PuzzleConfig = {
   feather?: boolean;
 };
 
-/** Tutorial: the licorice jar. Not a numbered level; never saved to progress. */
+/** Tutorial: the licorice jar. Not a numbered level. */
 export const TUTORIAL: PuzzleConfig = {
   id: 'tutorial',
   canvas: { width: 1086, height: 1448 },

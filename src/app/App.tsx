@@ -5,20 +5,19 @@ import { TutorialScreen } from '../screens/tutorial/TutorialScreen';
 import { HANDOFF_FADE_MS } from '../screens/tutorial/handoff';
 import { LevelScreen } from '../screens/level/LevelScreen';
 import { flowReducer } from '../game/flow';
-import { loadProgress, saveProgress } from '../game/progress';
+import { clearLegacyProgress } from '../game/progress';
 import { LEVELS, TUTORIAL, puzzleAssets } from '../game/levels';
 import { preloadImages } from '../ui/preload';
 
 export function App() {
   const [state, dispatch] = useReducer(flowReducer, undefined, () => ({
     screen: { name: 'welcome' as const },
-    progress: loadProgress(),
     levelCount: LEVELS.length,
   }));
   /** Story stays mounted on top of the tutorial while it fades (pixel hand-off). */
   const [storyFading, setStoryFading] = useState(false);
 
-  useEffect(() => saveProgress(state.progress), [state.progress]);
+  useEffect(clearLegacyProgress, []);
 
   // preload one step ahead: story while on the welcome screen, tutorial during the story
   const { screen } = state;
@@ -27,10 +26,10 @@ export function App() {
     if (screen.name === 'welcome') idle(() => void preloadStory());
     if (screen.name === 'story') idle(() => void preloadImages(puzzleAssets(TUTORIAL)));
     if (screen.name === 'tutorial' || screen.name === 'level') {
-      const next = screen.name === 'level' ? screen.index + 1 : state.progress.levelsCompleted;
+      const next = screen.name === 'level' ? screen.index + 1 : 0;
       if (LEVELS[next]) idle(() => void preloadImages(puzzleAssets(LEVELS[next])));
     }
-  }, [screen, state.progress.levelsCompleted]);
+  }, [screen]);
 
   const onStoryDone = (how: 'end' | 'skip') => {
     if (how === 'end') {

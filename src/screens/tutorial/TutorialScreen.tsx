@@ -9,7 +9,7 @@ import './tutorial.css';
 type Props = {
   /** Arrived through the story's pixel: start zoomed in and pull back. */
   fromStory: boolean;
-  /** Continue to the levels. The tutorial never touches saved level progress. */
+  /** Continue to Level 1. */
   onDone: () => void;
 };
 
