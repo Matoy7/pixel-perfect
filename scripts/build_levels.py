@@ -52,6 +52,8 @@ def paint_out_rows(img, box, pad=3):
 STRIPS = {
     # Level 4: busy edges (tree, sky, crane / flowers) → light tones: pale sky above, pale street below
     "4": {"light": 0.4},
+    # Level 5: flowers / trees / sky at the edges → same light treatment
+    "5": {"light": 0.4},
 }
 
 # Per-level art fixes (applied at build time; the source art stays untouched)

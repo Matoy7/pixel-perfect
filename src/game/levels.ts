@@ -77,6 +77,8 @@ export const LEVELS: PuzzleConfig[] = [
   // Level 4 – the construction site: the dark opening behind the bricklayer (yellow
   // hard hat, orange vest) on the left, 3rd floor up (opening x 316–365, y 655–722)
   level(4, { width: 1086, height: 1448 }, { x: 341, y: 683 }),
+  // Level 5 – the amusement park: centre of the busker's speaker grille, bottom left (grille x 194–227, y 1121–1153)
+  level(5, { width: 1086, height: 1448 }, { x: 210.5, y: 1137 }),
 ];
 
 export const puzzleAssets = (c: PuzzleConfig) => [...new Set([c.image, c.imageClean, c.extTop, c.extBottom])];
