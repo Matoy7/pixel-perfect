@@ -1,9 +1,9 @@
 """Build the tutorial (jar) assets from art/tutorial/jar.png (1086x1448).
 
   jar.webp               the illustration as supplied (shown during play)
-  jar-clean.webp         same, with the black square painted out — revealed
-                         after the success burst (stand-in until a clean
-                         version of the art is supplied)
+  jar-clean.webp         the jar as it looks once the pixel is found — revealed
+                         after the success burst (art/tutorial/jar-revealed.png,
+                         supplied art; falls back to painting the square out)
   jar-ext-top/bottom     edge strips for phones taller than the art
 
 Usage:  python3 scripts/build_tutorial.py
@@ -35,7 +35,11 @@ x, y, w, h = st[k, :4]
 print(f"square x={x} y={y} w={w} h={h} centre=({x + w / 2:.1f},{y + h / 2:.1f})")
 hole = np.zeros_like(dark)
 hole[y - 4:y + h + 4, x - 4:x + w + 4] = 1
-clean = cv2.inpaint(src, hole * 255, 15, cv2.INPAINT_TELEA)
+revealed = cv2.imread(f"{ART}/jar-revealed.png")
+if revealed is not None and revealed.shape == src.shape:
+    clean = revealed
+else:
+    clean = cv2.inpaint(src, hole * 255, 15, cv2.INPAINT_TELEA)
 to_pil(clean).save(f"{OUT}/jar-clean.webp", "WEBP", quality=90, method=6)
 
 edge_strip(src[:6], True, clean=True).save(f"{OUT}/jar-ext-top.webp", "WEBP", quality=92)
