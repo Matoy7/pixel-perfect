@@ -1,0 +1,60 @@
+:root {
+  /* stable visible height on mobile (dynamic toolbars) */
+  --app-height: 100vh;
+}
+@supports (height: 100dvh) {
+  :root {
+    --app-height: 100dvh;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: var(--app-height);
+  overflow: hidden;
+}
+
+body {
+  background: #ead9f2;
+  overscroll-behavior: none; /* no pull-to-refresh / bounce */
+  touch-action: manipulation; /* no double-tap browser zoom */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+}
+
+img {
+  -webkit-user-drag: none;
+}
+
+/* Mobile-only product: on wide screens show the phone-width column only. */
+.app {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  /* screens are full-bleed; each screen handles env(safe-area-inset-*) for its own UI */
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
