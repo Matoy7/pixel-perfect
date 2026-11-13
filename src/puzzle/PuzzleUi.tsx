@@ -18,13 +18,27 @@ const ID_FADE_MS = 700;
  * Level identification card: shown once `show` turns true (the level is fully
  * revealed), held 2.5s, faded out over 700ms (opacity only), then removed.
  */
-export function LevelIdCard({ show, place, number }: { show: boolean; place: string; number: string }) {
+export function LevelIdCard({
+  show,
+  place,
+  number,
+  onGone,
+}: {
+  show: boolean;
+  place: string;
+  number: string;
+  /** Fired once the card has faded out and been removed. */
+  onGone?: () => void;
+}) {
   const [phase, setPhase] = useState<'wait' | 'on' | 'out' | 'gone'>('wait');
   useEffect(() => {
     if (!show || phase !== 'wait') return;
     setPhase('on');
     const t1 = window.setTimeout(() => setPhase('out'), ID_HOLD_MS);
-    const t2 = window.setTimeout(() => setPhase('gone'), ID_HOLD_MS + ID_FADE_MS);
+    const t2 = window.setTimeout(() => {
+      setPhase('gone');
+      onGone?.();
+    }, ID_HOLD_MS + ID_FADE_MS);
     return () => {
       window.clearTimeout(t1);
       window.clearTimeout(t2);

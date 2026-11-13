@@ -20,6 +20,8 @@ export const copy = {
   level: {
     label: (n: number) => `שלב ${n}`,
     number: (n: number) => `שלב ${n}`,
+    /** Bottom instruction per level index (only levels listed here show one). */
+    hints: ['לחץ על הפיקסל השחור בתמונה', 'טיפ: נסו לעשות זום על אזורים חשודים'] as (string | undefined)[],
     /** Location line on the level identification card, by level index. */
     places: [
       'AM:PM · המכולת השכונתית',

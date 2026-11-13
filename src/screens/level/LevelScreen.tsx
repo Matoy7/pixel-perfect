@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { PuzzleScene } from '../../puzzle/PuzzleScene';
-import { LevelIdCard, SuccessCard } from '../../puzzle/PuzzleUi';
+import { LevelIdCard, PuzzleHint, SuccessCard } from '../../puzzle/PuzzleUi';
 import { LEVELS } from '../../game/levels';
 import { copy } from '../../copy/he';
 import './level.css';
@@ -17,7 +17,9 @@ type Props = {
 
 export function LevelScreen({ index, revealed, onSolved, onDone }: Props) {
   const [found, setFound] = useState<DOMRect | null>(null);
+  const [idGone, setIdGone] = useState(false);
   const n = index + 1;
+  const hint = copy.level.hints[index];
   return (
     <section className="level" aria-label={copy.level.label(n)}>
       <PuzzleScene
@@ -28,8 +30,15 @@ export function LevelScreen({ index, revealed, onSolved, onDone }: Props) {
         }}
       />
       {!found && (
-        <LevelIdCard show={revealed} place={copy.level.places[index] ?? ''} number={copy.level.number(n)} />
+        <LevelIdCard
+          show={revealed}
+          place={copy.level.places[index] ?? ''}
+          number={copy.level.number(n)}
+          onGone={() => setIdGone(true)}
+        />
       )}
+      {/* level instruction: same spot as the id card, so it follows once the card is gone */}
+      {hint && idGone && <PuzzleHint text={hint} hidden={!!found} />}
       {found && <SuccessCard title={copy.found.title} action={copy.found.next} onAction={() => onDone(found)} />}
     </section>
   );
