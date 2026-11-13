@@ -23,9 +23,4 @@ export const copy = {
     next: (n: number) => `המשך לשלב ${n}`,
     finish: 'המשך',
   },
-  complete: {
-    title: 'כל הכבוד! סיימת את כל השלבים',
-    text: 'שלבים נוספים בקרוב.',
-    playAgain: 'שחק שוב',
-  },
 };

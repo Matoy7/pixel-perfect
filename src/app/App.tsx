@@ -4,7 +4,6 @@ import { StoryScreen, preloadStory } from '../screens/story/StoryScreen';
 import { TutorialScreen } from '../screens/tutorial/TutorialScreen';
 import { HANDOFF_FADE_MS } from '../screens/tutorial/handoff';
 import { LevelScreen } from '../screens/level/LevelScreen';
-import { CompleteScreen } from '../screens/complete/CompleteScreen';
 import { flowReducer } from '../game/flow';
 import { loadProgress, saveProgress } from '../game/progress';
 import { LEVELS, TUTORIAL, puzzleAssets } from '../game/levels';
@@ -58,7 +57,6 @@ export function App() {
           onDone={() => dispatch({ type: 'LEVEL_DONE', index: screen.index })}
         />
       )}
-      {screen.name === 'complete' && <CompleteScreen onPlayAgain={() => dispatch({ type: 'PLAY_AGAIN' })} />}
       {showStory && (
         <div
           className={`app__layer${storyFading ? ' app__layer--fading' : ''}`}

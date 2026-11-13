@@ -1,6 +1,6 @@
 /**
  * Screen flow. The order is fixed:
- *   welcome → story (every time) → tutorial → levels → completion
+ *   welcome → story (every time) → tutorial → levels → back to welcome
  * Pure reducer: no side effects (persisting progress happens in App).
  */
 import type { Progress } from './progress';
@@ -9,8 +9,7 @@ export type Screen =
   | { name: 'welcome' }
   | { name: 'story' }
   | { name: 'tutorial'; fromStory: boolean }
-  | { name: 'level'; index: number }
-  | { name: 'complete' };
+  | { name: 'level'; index: number };
 
 export type FlowState = { screen: Screen; progress: Progress; levelCount: number };
 
@@ -18,12 +17,13 @@ export type FlowAction =
   | { type: 'PLAY' } // start button on the welcome screen
   | { type: 'STORY_DONE'; skipped: boolean } // story finished (hand-off) or skipped
   | { type: 'TUTORIAL_DONE' } // → next uncompleted level (tutorial is never saved)
-  | { type: 'LEVEL_DONE'; index: number } // saved immediately
-  | { type: 'PLAY_AGAIN' }; // completion → Level 1
+  | { type: 'LEVEL_DONE'; index: number }; // saved immediately
 
-/** Next uncompleted level, or completion when all available levels are done. */
-const nextScreen = (completed: number, count: number): Screen =>
-  completed < count ? { name: 'level', index: completed } : { name: 'complete' };
+/** Next uncompleted level; when all available levels are done, start again from Level 1. */
+const nextScreen = (completed: number, count: number): Screen => ({
+  name: 'level',
+  index: completed < count ? completed : 0,
+});
 
 export function flowReducer(state: FlowState, action: FlowAction): FlowState {
   switch (action.type) {
@@ -39,11 +39,10 @@ export function flowReducer(state: FlowState, action: FlowAction): FlowState {
       return { ...state, screen: nextScreen(state.progress.levelsCompleted, state.levelCount) };
     case 'LEVEL_DONE': {
       const levelsCompleted = Math.max(state.progress.levelsCompleted, action.index + 1);
+      // after the last available level: back to the welcome screen
       const screen: Screen =
-        action.index + 1 < state.levelCount ? { name: 'level', index: action.index + 1 } : { name: 'complete' };
+        action.index + 1 < state.levelCount ? { name: 'level', index: action.index + 1 } : { name: 'welcome' };
       return { ...state, screen, progress: { ...state.progress, levelsCompleted } };
     }
-    case 'PLAY_AGAIN':
-      return { ...state, screen: { name: 'level', index: 0 } };
   }
 }
