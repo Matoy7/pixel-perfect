@@ -58,3 +58,19 @@ img {
   white-space: nowrap;
   border: 0;
 }
+
+/* a screen layered over another during a hand-off */
+.app__layer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+}
+.app__layer--fading {
+  animation: app-layer-out var(--fade) ease-in-out both;
+  pointer-events: none;
+}
+@keyframes app-layer-out {
+  to {
+    opacity: 0;
+  }
+}

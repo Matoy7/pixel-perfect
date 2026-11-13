@@ -4,10 +4,13 @@
   height: 100%;
   overflow: hidden;
   background: #f8edf2; /* matches the scenes' wall */
-  transition: opacity var(--outro) ease-in;
 }
-.story--leaving {
-  opacity: 0;
+
+/* the monitor pixel, crisp at any zoom */
+.story__pixel {
+  position: absolute;
+  background: #000;
+  pointer-events: none;
 }
 
 /* ---- shots: stacked, the newest fades in over the previous one ---- */

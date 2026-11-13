@@ -8,8 +8,15 @@ export const copy = {
     skip: 'דילוג',
     label: 'הסיפור: פיגמי והפיקסל השחור',
   },
-  tutorialPlaceholder: {
-    title: 'כאן יגיע שלב האימון',
+  tutorial: {
+    instruction: 'לחץ על הפיקסל השחור בתמונה',
+    label: 'שלב אימון: מצא את הפיקסל השחור',
+    successTitle: 'מצוין! מצאת את הפיקסל',
+    successText: 'ככה משחקים בכל שלב.',
+    continue: 'המשך לשלב 1',
+  },
+  levelPlaceholder: {
+    title: 'שלב 1 יגיע בקרוב',
     back: 'חזרה למסך הפתיחה',
   },
 } as const;

@@ -11,6 +11,8 @@ type Props = {
   canvas: { width: number; height: number };
   /** Fade the art's top edge into the top strip (for art cut at the top). */
   featherTop?: boolean;
+  /** Same for the bottom edge. */
+  featherBottom?: boolean;
   className?: string;
   /** Overlays positioned in canvas percentages; --u = one source pixel. */
   children?: React.ReactNode;
@@ -22,12 +24,12 @@ type Props = {
  * art's own top/bottom edges.
  */
 export const ExtendedArt = forwardRef<HTMLDivElement, Props>(function ExtendedArt(
-  { src, extTop, extBottom, canvas, featherTop, className, children },
+  { src, extTop, extBottom, canvas, featherTop, featherBottom, className, children },
   stageRef,
 ) {
   return (
     <div
-      className={`xart${featherTop ? ' xart--feather' : ''}${className ? ` ${className}` : ''}`}
+      className={`xart${featherTop ? ' xart--feather-top' : ''}${featherBottom ? ' xart--feather-bottom' : ''}${className ? ` ${className}` : ''}`}
       style={{ '--art-w': canvas.width, '--art-h': canvas.height } as React.CSSProperties}
     >
       <div className="xart__ext" aria-hidden="true" style={{ backgroundImage: `url(${extTop})` }} />

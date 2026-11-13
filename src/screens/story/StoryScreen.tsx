@@ -2,7 +2,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type React from 'react';
 import { ExtendedArt } from '../../ui/ExtendedArt';
 import { copy } from '../../copy/he';
-import { OUTRO_FADE_MS, SCENES, STORY_CANVAS, sceneArt, type CameraCtx, type Scene } from './scenes';
+import { SCENES, STORY_CANVAS, STORY_PIXEL, sceneArt, type CameraCtx, type Scene } from './scenes';
+import { preloadImages } from '../../ui/preload';
 import { CLOCK_ASSETS, ClockHands } from './ClockHands';
 import { FIGHT_ASSETS, FIGHT_BG } from './fightCloud';
 import { FightCloud } from './FightCloud';
@@ -21,40 +22,28 @@ const STORY_ASSETS = [
   ...CLOCK_ASSETS,
 ];
 
-let preload: Promise<void> | null = null;
-export function preloadStory(): Promise<void> {
-  preload ??= Promise.all(
-    STORY_ASSETS.map(async (src) => {
-      const img = new Image();
-      img.src = src;
-      try {
-        await img.decode();
-      } catch {
-        /* a failed decode must not block the story; the browser retries on render */
-      }
-    }),
-  ).then(() => undefined);
-  return preload;
-}
+export const preloadStory = () => preloadImages(STORY_ASSETS);
 
 // ---------------------------------------------------------------------------
 
 type Props = {
-  /** Story finished or skipped. */
-  onDone: () => void;
+  /**
+   * Story finished (its last frame is zoomed into the pixel, lined up with
+   * the tutorial: the parent fades it out over the tutorial) or skipped.
+   */
+  onDone: (how: 'end' | 'skip') => void;
 };
 
 export function StoryScreen({ onDone }: Props) {
   const [ready, setReady] = useState(false);
   const [index, setIndex] = useState(0);
   const [prev, setPrev] = useState<number | null>(null);
-  const [leaving, setLeaving] = useState(false);
   const doneRef = useRef(false);
 
-  const finish = () => {
+  const finish = (how: 'end' | 'skip') => {
     if (doneRef.current) return;
     doneRef.current = true;
-    onDone();
+    onDone(how);
   };
 
   useEffect(() => {
@@ -71,8 +60,7 @@ export function StoryScreen({ onDone }: Props) {
     const scene = SCENES[index];
     const t = window.setTimeout(() => {
       if (index === SCENES.length - 1) {
-        setLeaving(true);
-        window.setTimeout(finish, OUTRO_FADE_MS);
+        finish('end'); // last frame stays up; the parent cross-fades to the tutorial
       } else {
         setPrev(index);
         setIndex(index + 1);
@@ -89,18 +77,14 @@ export function StoryScreen({ onDone }: Props) {
   }, [prev, index]);
 
   return (
-    <section
-      className={`story${leaving ? ' story--leaving' : ''}`}
-      aria-label={copy.story.label}
-      style={{ '--outro': `${OUTRO_FADE_MS}ms` } as React.CSSProperties}
-    >
+    <section className="story" aria-label={copy.story.label}>
       {ready && (
         <>
           {prev !== null && <Shot key={SCENES[prev].id} scene={SCENES[prev]} entering={false} />}
           <Shot key={SCENES[index].id} scene={SCENES[index]} entering />
         </>
       )}
-      <button type="button" className="story__skip" onClick={finish}>
+      <button type="button" className="story__skip" onClick={() => finish('skip')}>
         {copy.story.skip}
       </button>
     </section>
@@ -113,35 +97,66 @@ function Shot({ scene, entering }: { scene: Scene; entering: boolean }) {
   const art = sceneArt(scene.id);
   const stageRef = useRef<HTMLDivElement>(null);
   const cameraRef = useRef<HTMLDivElement>(null);
+  const pixelRef = useRef<HTMLDivElement>(null);
 
   // Camera: keyframes are resolved against the live layout, so zooms land
-  // exactly on their target (clock, monitor screen) on every screen size.
+  // exactly on their target (clock, monitor screen, pixel) on every screen size.
   useLayoutEffect(() => {
     const stage = stageRef.current;
     const cam = cameraRef.current;
     if (!stage || !cam) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const s = stage.getBoundingClientRect();
     const c = cam.getBoundingClientRect();
     const k = s.width / STORY_CANVAS.width;
     const q = { x: c.width / 2, y: c.height / 2 }; // screen centre (camera space)
-    const at = (x: number, y: number, sc: number) =>
-      `translate(${q.x - sc * x}px, ${q.y - sc * y}px) scale(${sc})`;
+    const point = (p: { x: number; y: number }) => ({ x: s.left - c.left + p.x * k, y: s.top - c.top + p.y * k });
     const ctx: CameraCtx = {
-      center: (sc) => at(q.x, q.y, sc),
-      focus: (p, sc) => at(s.left - c.left + p.x * k, s.top - c.top + p.y * k, sc),
+      center: (sc) => ({ tx: q.x - sc * q.x, ty: q.y - sc * q.y, s: sc }),
+      focus: (p, sc, target = q) => {
+        const pt = point(p);
+        return { tx: target.x - sc * pt.x, ty: target.y - sc * pt.y, s: sc };
+      },
+      point,
+      q,
+      viewport: { width: c.width, height: c.height },
+      k,
     };
-    const keys = scene.camera(ctx);
+    const keys = reduced ? [{ t: 0, cam: ctx.center(1) }, { t: 1, cam: ctx.center(1) }] : scene.camera(ctx);
     const total = keys[keys.length - 1].t || 1;
-    const anim = cam.animate(
-      keys.map((key) => ({
-        offset: key.t / total,
-        transform: key.transform,
-        easing: key.easing ?? 'linear',
-      })),
-      { duration: total, fill: 'both' },
-    );
-    return () => anim.cancel();
+    const timing = { duration: total, fill: 'both' as const };
+    const anims = [
+      cam.animate(
+        keys.map((key) => ({
+          offset: key.t / total,
+          transform: `translate(${key.cam.tx}px, ${key.cam.ty}px) scale(${key.cam.s})`,
+          easing: key.easing ?? 'linear',
+        })),
+        timing,
+      ),
+    ];
+    // The monitor pixel lives outside the zooming layer and is *sized* (not
+    // scaled) by the same keyframes: redrawn every frame, it stays a razor-sharp
+    // square at any zoom, exactly in step with the art.
+    const px = pixelRef.current;
+    if (px) {
+      const p0 = point(STORY_PIXEL);
+      const w = STORY_PIXEL.width * k;
+      anims.push(
+        px.animate(
+          keys.map((key) => ({
+            offset: key.t / total,
+            left: `${key.cam.tx + key.cam.s * p0.x}px`,
+            top: `${key.cam.ty + key.cam.s * p0.y}px`,
+            width: `${key.cam.s * w}px`,
+            height: `${key.cam.s * w}px`,
+            easing: key.easing ?? 'linear',
+          })),
+          timing,
+        ),
+      );
+    }
+    return () => anims.forEach((a) => a.cancel());
   }, [scene]);
 
   return (
@@ -162,6 +177,7 @@ function Shot({ scene, entering }: { scene: Scene; entering: boolean }) {
             {scene.id === 4 && <FightCloud />}
           </ExtendedArt>
         </div>
+        {scene.id === 5 && <div ref={pixelRef} className="story__pixel" />}
       </div>
     </div>
   );
