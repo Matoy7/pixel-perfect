@@ -1,32 +1,28 @@
 import { useState } from 'react';
 import { PuzzleScene } from '../../puzzle/PuzzleScene';
-import { PuzzleHint, SuccessCard } from '../../puzzle/PuzzleUi';
+import { LevelIdCard, SuccessCard } from '../../puzzle/PuzzleUi';
 import { LEVELS } from '../../game/levels';
 import { copy } from '../../copy/he';
 import './level.css';
 
 type Props = {
   index: number;
-  /** Pixel found and the player tapped continue. */
-  onDone: () => void;
+  /** The level is fully on screen (transition finished): show its id card. */
+  revealed: boolean;
+  /** Pixel found and the player tapped continue (with the pixel's on-screen rect). */
+  onDone: (pixelRect: DOMRect) => void;
 };
 
-export function LevelScreen({ index, onDone }: Props) {
-  const [found, setFound] = useState(false);
+export function LevelScreen({ index, revealed, onDone }: Props) {
+  const [found, setFound] = useState<DOMRect | null>(null);
   const n = index + 1;
-  const last = index === LEVELS.length - 1;
   return (
     <section className="level" aria-label={copy.level.label(n)}>
-      <PuzzleScene config={LEVELS[index]} onFound={() => setFound(true)} />
-      <PuzzleHint text={copy.level.hint(n)} hidden={found} />
-      {found && (
-        <SuccessCard
-          title={copy.level.successTitle}
-          text={copy.level.successText(n)}
-          action={last ? copy.level.finish : copy.level.next(n + 1)}
-          onAction={onDone}
-        />
+      <PuzzleScene config={LEVELS[index]} onFound={setFound} />
+      {!found && (
+        <LevelIdCard show={revealed} place={copy.level.places[index] ?? ''} number={copy.level.number(n)} />
       )}
+      {found && <SuccessCard title={copy.found.title} action={copy.found.next} onAction={() => onDone(found)} />}
     </section>
   );
 }

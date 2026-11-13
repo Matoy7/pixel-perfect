@@ -24,8 +24,11 @@ type Props = {
    * scene (the hand-off from the story). Input is ignored until it settles.
    */
   intro?: { scale: number; ms: number; holdMs?: number };
-  /** Correct pixel tapped and the burst has played. */
-  onFound: () => void;
+  /**
+   * Correct pixel tapped and the burst has played. `pixelRect` = where the
+   * pixel was on screen (incl. zoom): the origin of the level transition.
+   */
+  onFound: (pixelRect: DOMRect) => void;
 };
 
 /**
@@ -38,6 +41,7 @@ export function PuzzleScene({ config, intro, onFound }: Props) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const zoomRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const pixelRef = useRef<HTMLDivElement>(null);
   const view = useRef<View>({ s: 1, tx: 0, ty: 0 });
   const interactive = useRef(!intro);
   const [found, setFound] = useState(false);
@@ -102,7 +106,8 @@ export function PuzzleScene({ config, intro, onFound }: Props) {
   // ---- success ------------------------------------------------------------
   useEffect(() => {
     if (!found) return;
-    const t = window.setTimeout(onFound, BURST_MS);
+    const rect = pixelRef.current!.getBoundingClientRect(); // container: unaffected by the burst
+    const t = window.setTimeout(() => onFound(rect), BURST_MS);
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [found]);
@@ -241,7 +246,7 @@ export function PuzzleScene({ config, intro, onFound }: Props) {
         >
           {/* revealed under the burst: the art without its pixel */}
           <img className="puzzle__clean" src={config.imageClean} alt="" draggable={false} />
-          <div className="puzzle__pixel" style={{ ...pixelPos, ['--pixel-color' as string]: PIXEL_COLOR }}>
+          <div ref={pixelRef} className="puzzle__pixel" style={{ ...pixelPos, ['--pixel-color' as string]: PIXEL_COLOR }}>
             <div className="puzzle__pixel-core" />
             {found &&
               Array.from({ length: FRAGMENTS }, (_, i) => {

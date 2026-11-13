@@ -1,0 +1,160 @@
+.complete {
+  position: relative;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow: hidden;
+  background: #ead9f2;
+  color: #3a2a52;
+  text-align: center;
+}
+
+.complete:not(.complete--go) * {
+  animation-play-state: paused !important;
+}
+
+.complete__content {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 320px);
+}
+
+.complete__head {
+  position: relative;
+  display: inline-block;
+}
+.complete__title {
+  margin: 0;
+  font-size: 46px;
+  font-weight: 400;
+  line-height: 1.15;
+  animation: complete-title-in 520ms cubic-bezier(0.3, 1.4, 0.5, 1) 120ms both;
+}
+.complete__text {
+  margin: 10px 0 30px;
+  font-size: 20px;
+  line-height: 1.35;
+  animation: complete-fade-in 400ms ease-out 380ms both;
+}
+.complete__again {
+  width: 100%;
+  margin: 0;
+  padding: 13px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffd21f;
+  box-shadow: 0 4px 0 #e2a20b;
+  color: #2b1f12;
+  font: inherit;
+  font-size: 17px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 90ms ease-out,
+    box-shadow 90ms ease-out;
+  animation: complete-fade-in 400ms ease-out 520ms both;
+}
+.complete__again:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #e2a20b;
+}
+
+/* ---- pixel fireworks: squares burst out from the centre, then fade ---- */
+.complete__fx {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.complete__px {
+  position: absolute;
+  left: calc(var(--size) / -2);
+  top: calc(var(--size) / -2);
+  width: var(--size);
+  height: var(--size);
+  background: var(--c);
+  opacity: 0;
+  animation: complete-burst 1500ms cubic-bezier(0.15, 0.7, 0.3, 1) var(--delay) both;
+}
+@keyframes complete-burst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg) scale(0.4);
+  }
+  20% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    /* quarter turns only: always reads as a square */
+    transform: translate(var(--dx), calc(var(--dy) + 24px)) rotate(90deg) scale(1);
+  }
+}
+
+/* ---- a few squares bob around the headline, then settle out ---- */
+.complete__bob {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 8px;
+  height: 8px;
+  background: var(--c);
+  opacity: 0;
+  animation: complete-bob 1600ms ease-in-out var(--delay) both;
+}
+@keyframes complete-bob {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.3);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1);
+  }
+  35% {
+    transform: translateY(0);
+  }
+  55% {
+    transform: translateY(-5px);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+
+@keyframes complete-title-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes complete-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .complete__px,
+  .complete__bob {
+    display: none;
+  }
+  .complete__title {
+    animation-name: complete-fade-in;
+  }
+}

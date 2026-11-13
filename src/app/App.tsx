@@ -1,10 +1,12 @@
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import { WelcomeScreen } from '../screens/welcome/WelcomeScreen';
 import { StoryScreen, preloadStory } from '../screens/story/StoryScreen';
 import { TutorialScreen } from '../screens/tutorial/TutorialScreen';
 import { HANDOFF_FADE_MS } from '../screens/tutorial/handoff';
 import { LevelScreen } from '../screens/level/LevelScreen';
-import { flowReducer } from '../game/flow';
+import { CompleteScreen } from '../screens/complete/CompleteScreen';
+import { PixelGate, type GateOrigin } from '../ui/PixelGate';
+import { flowReducer, type FlowAction } from '../game/flow';
 import { clearLegacyProgress } from '../game/progress';
 import { LEVELS, TUTORIAL, puzzleAssets } from '../game/levels';
 import { preloadImages } from '../ui/preload';
@@ -18,6 +20,23 @@ export function App() {
   const [storyFading, setStoryFading] = useState(false);
 
   useEffect(clearLegacyProgress, []);
+
+  /** Level-to-level transition through the found pixel (see PixelGate). */
+  const [gate, setGate] = useState<{ origin: GateOrigin; phase: 'cover' | 'reveal' } | null>(null);
+  const gateAction = useRef<FlowAction | null>(null);
+
+  const passThroughPixel = async (rect: DOMRect, action: FlowAction, nextAssets: string[]) => {
+    if (gateAction.current) return; // already on the way
+    gateAction.current = action;
+    await preloadImages(nextAssets); // next art decoded before the dive: no blank frames
+    setGate({ origin: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, size: rect.width }, phase: 'cover' });
+  };
+  const onGateCovered = () => {
+    dispatch(gateAction.current!); // swap the screen under the black
+    gateAction.current = null;
+    // let the next screen paint once before revealing it
+    requestAnimationFrame(() => requestAnimationFrame(() => setGate((g) => g && { ...g, phase: 'reveal' })));
+  };
 
   // preload one step ahead: story while on the welcome screen, tutorial during the story
   const { screen } = state;
@@ -46,14 +65,31 @@ export function App() {
     <div className="app">
       {screen.name === 'welcome' && <WelcomeScreen onStart={() => dispatch({ type: 'PLAY' })} />}
       {screen.name === 'tutorial' && (
-        <TutorialScreen fromStory={screen.fromStory} onDone={() => dispatch({ type: 'TUTORIAL_DONE' })} />
+        <TutorialScreen
+          fromStory={screen.fromStory}
+          onDone={(rect) => passThroughPixel(rect, { type: 'TUTORIAL_DONE' }, puzzleAssets(LEVELS[0]))}
+        />
       )}
       {screen.name === 'level' && (
         // key: a fresh puzzle for each level
         <LevelScreen
           key={screen.index}
           index={screen.index}
-          onDone={() => dispatch({ type: 'LEVEL_DONE', index: screen.index })}
+          revealed={gate === null}
+          onDone={(rect) => {
+            const next = LEVELS[screen.index + 1];
+            passThroughPixel(rect, { type: 'LEVEL_DONE', index: screen.index }, next ? puzzleAssets(next) : []);
+          }}
+        />
+      )}
+      {screen.name === 'complete' && <CompleteScreen revealed={gate === null} onPlayAgain={() => dispatch({ type: 'RESTART' })} />}
+      {gate && (
+        <PixelGate
+          key={gate.phase}
+          phase={gate.phase}
+          origin={gate.origin}
+          onCovered={onGateCovered}
+          onRevealed={() => setGate(null)}
         />
       )}
       {showStory && (

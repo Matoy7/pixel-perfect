@@ -1,0 +1,23 @@
+/* Pixel gate: level-to-level transition overlay (see PixelGate.tsx). */
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+}
+.gate--cover {
+  pointer-events: auto; /* no taps while diving into the pixel */
+}
+.gate--reveal {
+  pointer-events: none;
+}
+.gate__square {
+  position: absolute;
+  background: #000;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+.gate__cell {
+  position: absolute;
+  background: #000;
+}
