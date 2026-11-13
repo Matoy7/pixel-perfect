@@ -79,6 +79,9 @@ export const LEVELS: PuzzleConfig[] = [
   level(4, { width: 1086, height: 1448 }, { x: 341, y: 683 }),
   // Level 5 – the amusement park: centre of the busker's speaker grille, bottom left (grille x 194–227, y 1121–1153)
   level(5, { width: 1086, height: 1448 }, { x: 210.5, y: 1137 }),
+  // Level 6 – the safari penguin exhibit: the black square inside the rhino on the
+  // Safari sign, right side (art square x 959–981, y 689–709)
+  level(6, { width: 1086, height: 1448 }, { x: 970, y: 699 }),
 ];
 
 export const puzzleAssets = (c: PuzzleConfig) => [...new Set([c.image, c.imageClean, c.extTop, c.extBottom])];
