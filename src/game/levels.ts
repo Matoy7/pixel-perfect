@@ -34,7 +34,11 @@ export type PuzzleConfig = {
   feather?: boolean;
 };
 
-/** Tutorial: the licorice jar. Not a numbered level. */
+/**
+ * Tutorial: the licorice jar. Not a numbered level.
+ * The ONE intended exception to the 8×8 rule: its pixel is the large square drawn
+ * in the jar art (same #000 colour). Every numbered level uses LEVEL_PIXEL_CSS.
+ */
 export const TUTORIAL: PuzzleConfig = {
   id: 'tutorial',
   canvas: { width: 1086, height: 1448 },
