@@ -4,14 +4,22 @@ import numpy as np
 from PIL import Image
 
 
-def edge_strip(rows_bgr, toward_top, n=96, clean=False):
+def edge_strip(rows_bgr, toward_top, n=96, clean=False, light=None):
     """Strip that continues an image edge (1 x W average row), blurring out as it
     goes away from the art. Stretched in CSS to fill phones taller than the art.
     clean=True: for edges cut through objects (a plant, a jar), use the edge's
     dominant colour (median, e.g. the wall) as a flat fill instead; pair it with
-    ExtendedArt's feathered edge so the art blends into it."""
+    ExtendedArt's feathered edge so the art blends into it.
+    light=<0..1>: for busy edges (foliage, flowers, sky) where the median turns
+    muddy — use the median of the edge's lighter half (the 'background' there,
+    e.g. sky), lifted towards white by that amount."""
     edge = rows_bgr.astype(np.float32).mean(axis=0, keepdims=True)
-    if clean:
+    if light is not None:
+        px = rows_bgr.reshape(-1, 3).astype(np.float32)
+        lum = px.mean(axis=1)
+        col = np.median(px[lum >= np.median(lum)], axis=0)
+        edge[:] = col * (1 - light) + 255 * light
+    elif clean:
         edge[:] = np.median(edge[0], axis=0)
     near = cv2.GaussianBlur(edge, (0, 0), sigmaX=16, sigmaY=0.1)
     far = cv2.GaussianBlur(edge, (0, 0), sigmaX=160, sigmaY=0.1)

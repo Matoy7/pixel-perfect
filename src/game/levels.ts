@@ -74,6 +74,9 @@ export const LEVELS: PuzzleConfig[] = [
   level(2, { width: 1086, height: 1448 }, { x: 892, y: 226 }),
   // Level 3 – the airport: one of the control tower's front windows (window x 363–385, y 86–115)
   level(3, { width: 1086, height: 1448 }, { x: 374, y: 100.5 }),
+  // Level 4 – the construction site: the dark opening behind the bricklayer (yellow
+  // hard hat, orange vest) on the left, 3rd floor up (opening x 316–365, y 655–722)
+  level(4, { width: 1086, height: 1448 }, { x: 341, y: 683 }),
 ];
 
 export const puzzleAssets = (c: PuzzleConfig) => [...new Set([c.image, c.imageClean, c.extTop, c.extBottom])];

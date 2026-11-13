@@ -48,6 +48,12 @@ def paint_out_rows(img, box, pad=3):
     img[y:y + h, x - pad:x + w + pad] = cv2.GaussianBlur(patch, (3, 3), 0)[1:-1]
 
 
+# Edge-strip style per level (default: flat dominant colour of the edge)
+STRIPS = {
+    # Level 4: busy edges (tree, sky, crane / flowers) → light tones: pale sky above, pale street below
+    "4": {"light": 0.4},
+}
+
 # Per-level art fixes (applied at build time; the source art stays untouched)
 FIXES = {
     # Level 1: the banana bunch's dark stem tip looked like the black pixel → banana yellow
@@ -63,6 +69,7 @@ for path in sorted(glob.glob("art/levels/level-*.png")):
     if n in FIXES:
         FIXES[n](img)
     Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB)).save(f"{OUT}/level-{n}.webp", "WEBP", quality=90, method=6)
-    edge_strip(img[:6], True, clean=True).save(f"{OUT}/level-{n}-ext-top.webp", "WEBP", quality=92)
-    edge_strip(img[-6:], False, clean=True).save(f"{OUT}/level-{n}-ext-bottom.webp", "WEBP", quality=92)
+    strip = STRIPS.get(n, {"clean": True})
+    edge_strip(img[:6], True, **strip).save(f"{OUT}/level-{n}-ext-top.webp", "WEBP", quality=92)
+    edge_strip(img[-6:], False, **strip).save(f"{OUT}/level-{n}-ext-bottom.webp", "WEBP", quality=92)
     print(f"level {n}: {img.shape[1]}x{img.shape[0]}")
