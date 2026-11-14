@@ -79,17 +79,17 @@ export const LEVELS: PuzzleConfig[] = [
   // Level 3 – the amusement park (art level-5): centre of the busker's speaker grille,
   // bottom left (grille x 194–227, y 1121–1153)
   level(5, { width: 1086, height: 1448 }, { x: 210.5, y: 1137 }),
-  // Level 4 – the construction site: the dark opening behind the bricklayer (yellow
-  // hard hat, orange vest) on the left, 3rd floor up (opening x 316–365, y 655–722)
-  level(4, { width: 1086, height: 1448 }, { x: 341, y: 683 }),
-  // Level 5 – the airport (art level-3): one of the control tower's front windows (window x 363–385, y 86–115)
-  level(3, { width: 1086, height: 1448 }, { x: 374, y: 100.5 }),
-  // Level 6 – the safari penguin exhibit: the black square inside the rhino on the
+  // Level 4 – the safari penguin exhibit (art level-6): the black square inside the rhino on the
   // Safari sign, right side (art square x 959–981, y 689–709)
   level(6, { width: 1086, height: 1448 }, { x: 970, y: 699 }),
-  // Level 7 – the post office: the black box on the red shelving, right edge, next to
+  // Level 5 – the post office (art level-7): the black box on the red shelving, right edge, next to
   // its white label (box front x 1019–1062, y 398–440; label x 1027–1041)
   level(7, { width: 1086, height: 1448 }, { x: 1054, y: 419 }),
+  // Level 6 – the construction site (art level-4): the dark opening behind the bricklayer (yellow
+  // hard hat, orange vest) on the left, 3rd floor up (opening x 316–365, y 655–722)
+  level(4, { width: 1086, height: 1448 }, { x: 341, y: 683 }),
+  // Level 7 – the airport (art level-3): one of the control tower's front windows (window x 363–385, y 86–115)
+  level(3, { width: 1086, height: 1448 }, { x: 374, y: 100.5 }),
 ];
 
 export const puzzleAssets = (c: PuzzleConfig) => [...new Set([c.image, c.imageClean, c.extTop, c.extBottom])];
