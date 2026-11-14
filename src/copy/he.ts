@@ -22,13 +22,13 @@ export const copy = {
     number: (n: number) => `שלב ${n}`,
     /** Bottom instruction per level index (only levels listed here show one). */
     hints: ['לחץ על הפיקסל השחור בתמונה', 'טיפ: נסו לעשות זום על אזורים חשודים'] as (string | undefined)[],
-    /** Location line on the level identification card, by level index. */
+    /** Location line on the level identification card, by play position (index). */
     places: [
       'AM:PM · המכולת השכונתית',
       'המשרד · צוות הפיתוח',
-      'נתב״ג · נמל התעופה בן גוריון',
-      'רחוב יפה · אתר הבנייה',
       'הלונה פארק · יום כיף',
+      'רחוב יפה · אתר הבנייה',
+      'נתב״ג · נמל התעופה בן גוריון',
       'הספארי · תצוגת הפינגווינים',
       'דואר ישראל · הסניף השכונתי',
     ],
