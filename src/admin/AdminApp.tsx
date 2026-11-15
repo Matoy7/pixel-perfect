@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createSupabase, supabaseConfigured } from '../analytics/supabase';
-import { Dashboard } from './Dashboard';
+import { Brand, Dashboard } from './Dashboard';
 
 /**
  * Admin entry. Security is enforced by the database, not by this page:
@@ -42,24 +42,27 @@ export function AdminApp() {
     setState({ kind: 'signedOut' });
   };
 
-  if (state.kind === 'loading') return <main className="adm adm--center">טוען…</main>;
+  if (state.kind === 'loading') return <main className="a-auth a-muted">טוען…</main>;
   if (state.kind === 'unconfigured')
     return (
-      <main className="adm adm--center">
-        <div className="adm-card adm-login">
-          <h1 className="adm-title">PIXEL PERFECT · ניהול</h1>
-          <p className="adm-muted">Supabase עדיין לא מחובר לאתר (חסרים VITE_SUPABASE_URL ו-VITE_SUPABASE_PUBLISHABLE_KEY).</p>
+      <main className="a-auth">
+        <div className="a-card a-login">
+          <Brand />
+          <p className="a-muted">Supabase עדיין לא מחובר לאתר (חסרים VITE_SUPABASE_URL ו-VITE_SUPABASE_PUBLISHABLE_KEY).</p>
         </div>
       </main>
     );
   if (state.kind === 'signedOut') return <Login sb={sb!} onSignedIn={() => check(sb!)} />;
   if (state.kind === 'notAdmin')
     return (
-      <main className="adm adm--center">
-        <div className="adm-card adm-login">
-          <h1 className="adm-title">אין הרשאת ניהול</h1>
-          <p className="adm-muted">{state.email} מחובר, אבל אינו מוגדר כמנהל.</p>
-          <button className="adm-btn" onClick={signOut}>
+      <main className="a-auth">
+        <div className="a-card a-login">
+          <Brand />
+          <h1 className="a-h2">אין הרשאת ניהול</h1>
+          <p className="a-muted">
+            <span dir="ltr">{state.email}</span> מחובר, אבל אינו מוגדר כמנהל.
+          </p>
+          <button className="a-btn" onClick={signOut}>
             התנתקות
           </button>
         </div>
@@ -74,9 +77,9 @@ function Login({ sb, onSignedIn }: { sb: SupabaseClient; onSignedIn: () => void 
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   return (
-    <main className="adm adm--center">
+    <main className="a-auth">
       <form
-        className="adm-card adm-login"
+        className="a-card a-login"
         onSubmit={async (e) => {
           e.preventDefault();
           if (!email || !password) return setError('יש למלא אימייל וסיסמה');
@@ -88,12 +91,13 @@ function Login({ sb, onSignedIn }: { sb: SupabaseClient; onSignedIn: () => void 
           else onSignedIn();
         }}
       >
-        <h1 className="adm-title">PIXEL PERFECT · ניהול</h1>
-        <label className="adm-field">
+        <Brand />
+        <h1 className="a-h2">כניסת מנהל</h1>
+        <label className="a-field">
           <span>אימייל</span>
           <input type="email" dir="ltr" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
-        <label className="adm-field">
+        <label className="a-field">
           <span>סיסמה</span>
           <input
             type="password"
@@ -103,8 +107,8 @@ function Login({ sb, onSignedIn }: { sb: SupabaseClient; onSignedIn: () => void 
             onChange={(e) => setPassword(e.target.value)}
           />
         </label>
-        {error && <p className="adm-error">{error}</p>}
-        <button className="adm-btn" type="submit" disabled={busy}>
+        {error && <p className="a-error">{error}</p>}
+        <button className="a-btn" type="submit" disabled={busy}>
           {busy ? 'מתחבר…' : 'כניסה'}
         </button>
       </form>

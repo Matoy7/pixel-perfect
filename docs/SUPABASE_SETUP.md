@@ -34,6 +34,14 @@ Run `supabase/migrations/0002_player_device.sql` the same way. It adds the
 player's device (phone / tablet / computer, model, OS, browser) to `players`
 plus the dashboard's device summary. Safe to re-run; existing data is kept.
 
+### 3c. Activity over time (migration 0003)
+Run `supabase/migrations/0003_admin_activity.sql` the same way. It adds the
+read-only, admins-only `admin_activity(hours, time_zone)` report behind the
+dashboard's date-range selector (24 hours / 7 days / 30 days) and the
+"פעילות שחקנים לאורך זמן" chart. No tables are changed. Safe to re-run.
+Until it is run, the dashboard shows a note in place of the chart and the
+"active" tile falls back to the last 24 hours.
+
 ## 4. Create your admin login
 1. **Authentication → Users → Add user → Create new user** – your email + a strong
    password, tick **Auto Confirm User**.
