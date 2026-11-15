@@ -31,7 +31,7 @@
 
   /* type scale */
   --t-page: 26px; /* page title */
-  --t-kpi-1: 36px; /* primary KPI */
+  --t-kpi-1: 44px; /* primary KPI */
   --t-kpi-2: 28px; /* secondary KPI */
   --t-card: 16px; /* card titles */
   --t-body: 14px;
@@ -686,7 +686,8 @@ h2 {
   gap: var(--s-4);
 }
 .o-row--top {
-  grid-template-columns: minmax(0, 15fr) minmax(0, 14fr);
+  /* RTL: KPI 2×2 | growth chart | unique players */
+  grid-template-columns: minmax(0, 7fr) minmax(0, 4fr) minmax(0, 3fr);
 }
 .o-row--mid {
   grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
@@ -700,15 +701,14 @@ h2 {
   gap: var(--s-4);
 }
 
-/* primary KPI: unique players — text and a compact chart, both centred vertically */
+/* growth chart: purple card holding only the sparkline */
 .o-hero {
   position: relative;
   display: flex;
-  align-items: center;
   min-width: 0;
   min-height: 160px;
+  padding: var(--s-5) var(--s-5) var(--s-4);
   overflow: hidden;
-  color: #fff;
   border-radius: var(--r-lg);
   background: radial-gradient(120% 140% at 0% 0%, #9461fd 0%, rgba(148, 97, 253, 0) 55%),
     linear-gradient(118deg, #8452f8 0%, #6d3de6 45%, #5a30d2 100%);
@@ -718,8 +718,6 @@ h2 {
   position: relative;
   flex: 1;
   min-width: 0;
-  height: 88px;
-  margin-inline: var(--s-5) var(--s-4);
 }
 .o-spark svg {
   position: absolute;
@@ -727,64 +725,57 @@ h2 {
   display: block;
   overflow: visible;
 }
-.o-hero__text {
-  flex: 0 0 auto;
+
+/* primary KPI: unique players (white card, centred) */
+.o-unique {
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  min-width: 184px;
-  padding: var(--s-4) var(--s-5);
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  padding: var(--s-4);
+  background: var(--card);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  text-align: center;
 }
-.o-hero__title {
+.o-unique__title {
   display: flex;
   align-items: center;
   gap: var(--s-2);
-  flex-direction: row-reverse;
 }
-.o-hero__title h2 {
-  font-size: var(--t-body);
-  font-weight: 500;
-  opacity: 0.92;
+.o-unique__title h2 {
+  font-size: var(--t-card);
+  font-weight: 600;
+  white-space: nowrap;
 }
-.o-hero__icon {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--r-sm);
-  background: rgba(255, 255, 255, 0.18);
-  display: grid;
-  place-items: center;
-}
-.o-hero__icon svg {
-  width: 16px;
-  height: 16px;
-}
-.o-hero__value {
-  margin-top: var(--s-2);
+.o-unique__value {
   font-size: var(--t-kpi-1);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.01em;
+  color: var(--primary-600);
 }
-.o-hero__pill {
-  margin-top: var(--s-2);
+.o-unique__pill {
   display: inline-flex;
   align-items: center;
   gap: var(--s-1);
   height: 24px;
-  padding: 0 var(--s-2);
+  padding: 0 var(--s-3);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--green-bg);
   color: var(--ink-2);
   font-size: var(--t-meta);
   font-weight: 500;
   white-space: nowrap;
 }
-.o-hero__arrow {
-  width: 13px;
-  height: 13px;
+.o-unique__arrow {
+  width: 12px;
+  height: 12px;
   color: #13a046;
 }
-.o-hero__delta {
+.o-unique__delta {
   color: #13a046;
   font-weight: 700;
 }
@@ -1440,13 +1431,18 @@ h2 {
 
 /* ================================================================ tablet */
 @media (max-width: 1280px) {
+  /* unique players + chart side by side, KPI cards below */
   .o-row--top {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+  .o-unique {
+    order: -2;
   }
   .o-hero {
     order: -1;
   }
   .o-kpis {
+    grid-column: 1 / -1;
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
@@ -1701,22 +1697,16 @@ h2 {
     align-items: flex-start;
     gap: var(--s-2);
   }
-  /* hero: text above the chart */
+  /* unique players, then the chart, then the KPI cards */
+  .o-row--top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .o-unique {
+    padding: var(--s-5) var(--s-4);
+  }
   .o-hero {
-    flex-direction: column-reverse;
-    align-items: stretch;
-    min-height: 0;
-  }
-  .o-hero__text {
-    padding: var(--s-4) var(--s-4) 0;
-  }
-  .o-hero__pill {
-    margin-top: var(--s-3);
-  }
-  .o-spark {
-    flex: none;
-    height: 88px;
-    margin: var(--s-4);
+    min-height: 128px;
+    padding: var(--s-4);
   }
   .o-card__head h2 {
     white-space: normal;

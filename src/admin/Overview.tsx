@@ -96,23 +96,24 @@ export function Overview({ data, range, loading }: { data: AdminData; range: Ran
           <Kpi icon={<IconLayers />} value={num(ov?.total_level_completions)} label="השלמות שלבים" />
         </div>
 
-        <section className="o-hero">
+        <section className="o-hero" aria-label="גידול במספר השחקנים">
           <Sparkline points={grow.points} unit={range === 24 ? 'hour' : 'day'} />
-          <div className="o-hero__text">
-            <div className="o-hero__title">
-              <h2>שחקנים ייחודיים</h2>
-              <span className="o-hero__icon">
-                <IconUsers />
-              </span>
-            </div>
-            <div className="o-hero__value">{num(ov?.total_players)}</div>
-            <div className="o-hero__pill" title={`${num(grow.added)} שחקנים חדשים ב${r.label}`}>
-              <span>{r.compare}</span>
-              <IconArrowUp size={18} className="o-hero__arrow" />
-              <span className="o-hero__delta" dir="ltr">
-                {grow.change === null ? (grow.added ? `+${num(grow.added)}` : '0%') : `+${pct1(grow.change)}`}
-              </span>
-            </div>
+        </section>
+
+        <section className="o-unique">
+          <div className="o-unique__title">
+            <span className="o-tile">
+              <IconUsers />
+            </span>
+            <h2>שחקנים ייחודיים</h2>
+          </div>
+          <div className="o-unique__value">{num(ov?.total_players)}</div>
+          <div className="o-unique__pill" title={`${num(grow.added)} שחקנים חדשים ב${r.label}`}>
+            <span>{r.compare}</span>
+            <IconArrowUp size={14} className="o-unique__arrow" />
+            <span className="o-unique__delta" dir="ltr">
+              {grow.change === null ? (grow.added ? `+${num(grow.added)}` : '0%') : `+${pct1(grow.change)}`}
+            </span>
           </div>
         </section>
       </div>

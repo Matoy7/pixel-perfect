@@ -82,6 +82,10 @@ Data the dashboard currently loads (all in `Dashboard.tsx` `load()`):
 
 Removed on purpose (Yotam asked): the "פעילות אחרונה" (recent activity) panel. Don't bring it back unless asked.
 
+**Top row split (15 Nov 2026).** Row 1 (RTL) = KPI 2×2 (7fr) | purple growth-chart card `.o-hero`
+(sparkline only, 4fr) | white "שחקנים ייחודיים" card `.o-unique` (3fr: title + total in purple 44 px + green
+"בהשוואה ל…" pill). Desktop row 160 px; tablet: unique + chart side by side, KPIs below; phone stacked.
+
 **Sources card (15 Nov 2026).** "סיכום ביצועים" was replaced by "פילוח מקורות משתמשים" (`Sources` in
 `Overview.tsx`). Data = `players.device_browser` (migration 0002, browser of the player's **latest** visit),
 via `sourcesFromPlayers()` in `data.tsx`: in-app browsers Facebook / Instagram / LinkedIn name the app the
