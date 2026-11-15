@@ -31,7 +31,7 @@
 
   /* type scale */
   --t-page: 26px; /* page title */
-  --t-kpi-1: 40px; /* primary KPI */
+  --t-kpi-1: 36px; /* primary KPI */
   --t-kpi-2: 28px; /* secondary KPI */
   --t-card: 16px; /* card titles */
   --t-body: 14px;
@@ -686,7 +686,7 @@ h2 {
   gap: var(--s-4);
 }
 .o-row--top {
-  grid-template-columns: minmax(0, 4fr) minmax(0, 5fr);
+  grid-template-columns: minmax(0, 15fr) minmax(0, 14fr);
 }
 .o-row--mid {
   grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
@@ -700,12 +700,13 @@ h2 {
   gap: var(--s-4);
 }
 
-/* primary KPI: unique players */
+/* primary KPI: unique players — text and a compact chart, both centred vertically */
 .o-hero {
   position: relative;
   display: flex;
+  align-items: center;
   min-width: 0;
-  min-height: 192px;
+  min-height: 160px;
   overflow: hidden;
   color: #fff;
   border-radius: var(--r-lg);
@@ -717,7 +718,8 @@ h2 {
   position: relative;
   flex: 1;
   min-width: 0;
-  margin: var(--s-8) var(--s-5) var(--s-5) var(--s-6);
+  height: 88px;
+  margin-inline: var(--s-5) var(--s-4);
 }
 .o-spark svg {
   position: absolute;
@@ -730,8 +732,8 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  min-width: 200px;
-  padding: var(--s-5);
+  min-width: 184px;
+  padding: var(--s-4) var(--s-5);
 }
 .o-hero__title {
   display: flex;
@@ -745,32 +747,32 @@ h2 {
   opacity: 0.92;
 }
 .o-hero__icon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--r-sm);
   background: rgba(255, 255, 255, 0.18);
   display: grid;
   place-items: center;
 }
 .o-hero__icon svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 .o-hero__value {
-  margin-top: var(--s-3);
+  margin-top: var(--s-2);
   font-size: var(--t-kpi-1);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.01em;
 }
 .o-hero__pill {
-  margin-top: auto;
+  margin-top: var(--s-2);
   display: inline-flex;
   align-items: center;
   gap: var(--s-1);
-  height: 28px;
-  padding: 0 var(--s-3);
-  border-radius: 14px;
+  height: 24px;
+  padding: 0 var(--s-2);
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.9);
   color: var(--ink-2);
   font-size: var(--t-meta);
@@ -1418,13 +1420,21 @@ h2 {
 /* ================================================================ desktop: even row heights */
 @media (min-width: 1281px) {
   .o-row--top {
-    height: 192px;
+    height: 160px;
   }
   .o-kpis {
     grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: var(--s-3);
   }
   .o-kpis .a-kpi {
     min-height: 0;
+    padding-block: 0;
+  }
+  .o-kpis .a-kpi__value {
+    line-height: 1.1;
+  }
+  .o-kpis .a-kpi__label {
+    margin-top: 2px;
   }
 }
 
@@ -1694,6 +1704,7 @@ h2 {
   /* hero: text above the chart */
   .o-hero {
     flex-direction: column-reverse;
+    align-items: stretch;
     min-height: 0;
   }
   .o-hero__text {
