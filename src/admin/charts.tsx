@@ -1,6 +1,6 @@
 /** Plain SVG / HTML charts (no chart library). Single purple hue, numbers visible, hover tooltips. */
-import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { pct, num, type LevelProgress, type Family, FAMILY_LABEL, timeText, dateText, type Activity } from './data';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { pct, num, type LevelProgress, type Family, FAMILY_LABEL, timeText, dateText } from './data';
 
 function useSize<T extends HTMLElement>() {
   const ref = useRef<T>(null);
@@ -73,99 +73,78 @@ export function LevelBars({ rows }: { rows: LevelProgress[] }) {
 // מכשירים ופלטפורמות
 // ---------------------------------------------------------------------------
 
-export const FAMILY_COLOR: Record<Family, string> = {
-  ios: '#6a3fe6',
-  windows: '#8c6cf0',
-  android: '#ae97f5',
-  mac: '#d3c7fa',
-  other: '#dfe2ea',
+/** Shades by size: the biggest platform is the darkest; "אחר" is always grey. */
+const SHADES = ['#6232dc', '#a77ff9', '#cbb2fc', '#e3d6fe'];
+const OTHER = '#e6e4ef';
+export const donutColors = (list: { family: Family }[]) => {
+  let k = 0;
+  return list.map((s) => (s.family === 'other' ? OTHER : SHADES[Math.min(k++, SHADES.length - 1)]));
 };
 
 export function Donut({ total, list }: { total: number; list: { family: Family; n: number }[] }) {
   const [hover, setHover] = useState<Family | null>(null);
-  const R = 58;
-  const W = 22;
+  const SIZE = 198;
+  const W = 37;
+  const R = SIZE / 2 - W / 2;
   const C = 2 * Math.PI * R;
-  const gap = list.length > 1 ? 2.5 : 0; // surface gap between segments (px along the ring)
+  const gap = list.length > 1 ? 1.6 : 0; // white hairline between segments
+  const colors = donutColors(list);
   let acc = 0;
-  const segs = list.map((s) => {
+  const segs = list.map((s, i) => {
     const len = (s.n / total) * C;
-    const seg = { ...s, start: acc, len };
+    const seg = { ...s, start: acc, len, color: colors[i] };
     acc += len;
     return seg;
   });
   const hv = list.find((s) => s.family === hover);
   return (
-    <div className="a-donut">
-      <ul className="a-legend">
-        {list.map((s) => (
+    <div className="o-donut" dir="ltr">
+      <div className="o-donut__chart">
+        <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width={SIZE} height={SIZE} role="img" aria-label={`${total} מכשירים`}>
+          <g transform={`rotate(-90 ${SIZE / 2} ${SIZE / 2})`}>
+            {segs.map((s) => (
+              <circle
+                key={s.family}
+                cx={SIZE / 2}
+                cy={SIZE / 2}
+                r={R}
+                fill="none"
+                stroke={s.color}
+                strokeWidth={W}
+                strokeDasharray={`${Math.max(0.1, s.len - gap)} ${C}`}
+                strokeDashoffset={-s.start}
+                opacity={hover && hover !== s.family ? 0.55 : 1}
+                onPointerEnter={() => setHover(s.family)}
+                onPointerLeave={() => setHover(null)}
+                style={{ transition: 'opacity .15s' }}
+              />
+            ))}
+          </g>
+        </svg>
+        <div className="o-donut__center" dir="rtl">
+          <b>{num(hv ? hv.n : total)}</b>
+          <span>{hv ? FAMILY_LABEL[hv.family] : 'מכשירים'}</span>
+        </div>
+      </div>
+      <ul className="o-legend">
+        {segs.map((s) => (
           <li
             key={s.family}
             className={hover === s.family ? 'is-hover' : ''}
             onPointerEnter={() => setHover(s.family)}
             onPointerLeave={() => setHover(null)}
           >
-            <span className="a-legend__count" dir="ltr">
-              {num(s.n)} <span className="a-muted">({pct(s.n / total)})</span>
-            </span>
-            <span className="a-legend__name" dir="ltr">
-              <i style={{ background: FAMILY_COLOR[s.family] }} />
-              {FAMILY_LABEL[s.family]}
-            </span>
+            <i style={{ background: s.color }} />
+            <span className="o-legend__name">{FAMILY_LABEL[s.family]}</span>
+            <b className="o-legend__n">{num(s.n)}</b>
+            <span className="o-legend__pct">({pct(s.n / total)})</span>
           </li>
         ))}
       </ul>
-      <div className="a-donut__chart">
-        <svg viewBox="0 0 150 150" width="150" height="150" role="img" aria-label={`${total} מכשירים`}>
-          <g transform="rotate(-90 75 75)">
-            {segs.map((s) => (
-              <circle
-                key={s.family}
-                cx="75"
-                cy="75"
-                r={R}
-                fill="none"
-                stroke={FAMILY_COLOR[s.family]}
-                strokeWidth={hover === s.family ? W + 4 : W}
-                strokeDasharray={`${Math.max(0.1, s.len - gap)} ${C}`}
-                strokeDashoffset={-s.start}
-                onPointerEnter={() => setHover(s.family)}
-                onPointerLeave={() => setHover(null)}
-                style={{ transition: 'stroke-width .15s' }}
-              />
-            ))}
-          </g>
-        </svg>
-        <div className="a-donut__center">
-          {hv ? (
-            <>
-              <b>{num(hv.n)}</b>
-              <span>{FAMILY_LABEL[hv.family]}</span>
-            </>
-          ) : (
-            <>
-              <b>{num(total)}</b>
-              <span>מכשירים</span>
-            </>
-          )}
-        </div>
-      </div>
     </div>
   );
 }
 
-// ---------------------------------------------------------------------------
-// פעילות שחקנים לאורך זמן
-// ---------------------------------------------------------------------------
-
-/** 0, 50, 100… — round step that gives ~4 intervals */
-function niceMax(max: number) {
-  if (max <= 4) return { top: 4, step: 1 };
-  const raw = max / 4;
-  const p = 10 ** Math.floor(Math.log10(raw));
-  const step = [1, 2, 2.5, 5, 10].map((m) => m * p).find((s) => s >= raw)!;
-  return { top: Math.ceil(max / step) * step, step };
-}
 
 /** monotone cubic path (no overshoot below 0) */
 function smooth(pts: [number, number][]) {
@@ -201,97 +180,63 @@ function smooth(pts: [number, number][]) {
   return path;
 }
 
-export function AreaChart({ activity }: { activity: Activity }) {
-  const [ref, { w: width, h: boxH }] = useSize<HTMLDivElement>();
+
+// ---------------------------------------------------------------------------
+// Hero sparkline (white on purple)
+// ---------------------------------------------------------------------------
+
+export function Sparkline({ points, unit }: { points: number[]; unit: 'hour' | 'day' }) {
+  const [ref, { w: W, h: H }] = useSize<HTMLDivElement>();
   const [hover, setHover] = useState<number | null>(null);
-  const s = activity.series;
-  const H = Math.max(160, Math.min(320, boxH)); // fills the card, which matches its row neighbour
-  const padL = 34;
-  const padR = 14;
-  const padT = 14;
-  const padB = 26;
-  const W = Math.max(240, width);
-  const { top, step } = useMemo(() => niceMax(Math.max(0, ...s.map((p) => p.players))), [s]);
-  const x = (i: number) => padL + (s.length > 1 ? (i / (s.length - 1)) * (W - padL - padR) : 0);
-  const y = (v: number) => padT + (1 - v / top) * (H - padT - padB);
-  const pts = s.map((p, i) => [x(i), y(p.players)] as [number, number]);
+  const n = points.length;
+  const min = Math.min(...points);
+  const max = Math.max(...points);
+  const padT = 2; // the end dot may overflow the box (svg overflow is visible)
+  const padR = 0;
+  const x = (i: number) => (n > 1 ? (i / (n - 1)) * (W - padR) : 0);
+  const y = (v: number) => (max === min ? H * 0.55 : padT + (1 - (v - min) / (max - min)) * (H - padT));
+  const pts = points.map((v, i) => [x(i), y(v)] as [number, number]);
   const line = smooth(pts);
-  const area = pts.length ? `${line} L${pts[pts.length - 1][0]},${y(0)} L${pts[0][0]},${y(0)} Z` : '';
-  const ticks = Array.from({ length: Math.round(top / step) + 1 }, (_, i) => i * step);
-
-  // x labels: every 3 hours / every day (7) / every 5 days (30)
-  const every = activity.unit === 'hour' ? 3 : s.length > 10 ? 5 : 1;
-  const label = (t: string) => (activity.unit === 'hour' ? timeText(t) : dateText(t).slice(0, 5));
-  const labelled = s.map((_, i) => i).filter((i) => (s.length - 1 - i) % every === 0);
-
-  // highlighted point: hovered, else the latest
-  const hi = hover ?? s.length - 1;
-  const hp = s[hi];
-  const when = (t: string) => {
-    if (activity.unit === 'day') return dateText(t);
-    const end = new Date(new Date(t).getTime() + 3600e3).toISOString();
-    return `${timeText(t)}–${timeText(end)}`;
-  };
-
+  const area = n ? `${line} L${pts[n - 1][0]},${H} L${pts[0][0]},${H} Z` : '';
+  const hi = hover ?? n - 1;
+  const step = unit === 'hour' ? 3600e3 : 86400e3;
+  const at = new Date(Date.now() - (n - 1 - hi) * step).toISOString();
   return (
-    <div className="a-area" ref={ref} dir="ltr">
-      {width > 0 && (
+    <div className="o-spark" ref={ref}>
+      {W > 0 && n > 0 && (
         <svg
           width={W}
           height={H}
           role="img"
-          aria-label="שחקנים פעילים לאורך זמן"
+          aria-label="גידול במספר השחקנים"
           onPointerMove={(e) => {
             const r = e.currentTarget.getBoundingClientRect();
-            const px = e.clientX - r.left;
-            const i = Math.round(((px - padL) / (W - padL - padR)) * (s.length - 1));
-            setHover(Math.max(0, Math.min(s.length - 1, i)));
+            const i = Math.round(((e.clientX - r.left) / (W - padR)) * (n - 1));
+            setHover(Math.max(0, Math.min(n - 1, i)));
           }}
           onPointerLeave={() => setHover(null)}
         >
           <defs>
-            <linearGradient id="a-area-fill" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stopColor="#7047eb" stopOpacity="0.28" />
-              <stop offset="1" stopColor="#7047eb" stopOpacity="0.02" />
+            <linearGradient id="o-spark-fill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0" stopColor="#fff" stopOpacity="0.26" />
+              <stop offset="1" stopColor="#fff" stopOpacity="0.12" />
             </linearGradient>
+            <filter id="o-spark-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" />
+            </filter>
           </defs>
-          {ticks.map((t) => (
-            <g key={t}>
-              <line x1={padL} x2={W - padR} y1={y(t)} y2={y(t)} className="a-area__grid" />
-              <text x={padL - 10} y={y(t)} className="a-area__ytick" textAnchor="end" dominantBaseline="middle">
-                {t}
-              </text>
-            </g>
-          ))}
-          {labelled.map((i) => (
-            <text key={i} x={x(i)} y={H - 6} className="a-area__xtick" textAnchor="middle">
-              {label(s[i].t)}
-            </text>
-          ))}
-          <path d={area} fill="url(#a-area-fill)" />
-          <path d={line} className="a-area__line" />
-          {hp && (
-            <>
-              {hover !== null && <line x1={x(hi)} x2={x(hi)} y1={padT} y2={y(0)} className="a-area__cross" />}
-              <circle cx={x(hi)} cy={y(hp.players)} r="5" className="a-area__dot" />
-            </>
-          )}
+          <path d={area} fill="url(#o-spark-fill)" />
+          <path d={line} fill="none" stroke="#fff" strokeWidth="2.6" strokeLinejoin="round" />
+          {hover !== null && <line x1={x(hi)} x2={x(hi)} y1={y(points[hi])} y2={H} stroke="#fff" strokeOpacity=".5" strokeDasharray="3 3" />}
+          <circle cx={x(hi)} cy={y(points[hi])} r="9" fill="#fff" opacity=".45" filter="url(#o-spark-glow)" />
+          <circle cx={x(hi)} cy={y(points[hi])} r="7.5" fill="#fff" />
         </svg>
       )}
-      {hp && width > 0 && (
-        <div
-          className={`a-area__pill${hover !== null ? ' is-hover' : ''}`}
-          style={{ left: Math.min(W - 40, Math.max(40, x(hi))), top: y(hp.players) - 12 }}
-          dir="rtl"
-        >
-          {hover !== null ? (
-            <>
-              <b>{num(hp.players)}</b> שחקנים · <span dir="ltr">{when(hp.t)}</span>
-            </>
-          ) : (
-            num(hp.players)
-          )}
-        </div>
+      {hover !== null && W > 0 && (
+        <Tip x={Math.min(W - 70, Math.max(70, x(hi)))} y={y(points[hi]) - 6}>
+          <b>{num(points[hi])} שחקנים</b>
+          <span dir="ltr">{unit === 'hour' ? `${timeText(at)}, ${dateText(at)}` : dateText(at)}</span>
+        </Tip>
       )}
     </div>
   );

@@ -42,6 +42,13 @@ dashboard's date-range selector (24 hours / 7 days / 30 days) and the
 Until it is run, the dashboard shows a note in place of the chart and the
 "active" tile falls back to the last 24 hours.
 
+### 3d. Average play time (migration 0004)
+Run `supabase/migrations/0004_admin_play_time.sql` the same way. It adds the
+read-only, admins-only `admin_play_time()` report behind "זמן משחק ממוצע" in the
+dashboard's "סיכום ביצועים" card (time from a play's start to finishing all
+levels; runs over 6 hours are ignored) plus one index on `player_events`.
+No data is changed. Safe to re-run. Until it is run, the card shows "–".
+
 ## 4. Create your admin login
 1. **Authentication → Users → Add user → Create new user** – your email + a strong
    password, tick **Auto Confirm User**.

@@ -82,7 +82,17 @@ Data the dashboard currently loads (all in `Dashboard.tsx` `load()`):
 
 Removed on purpose (Yotam asked): the "פעילות אחרונה" (recent activity) panel. Don't bring it back unless asked.
 
-**Redesign of 15 Nov 2026 (current).** SaaS-style dashboard from Yotam's two-screen reference:
+**Overview v2 (15 Nov 2026 evening, current)** — pixel-matched to Yotam's second reference
+(1672×941): purple hero "שחקנים ייחודיים" (total + cumulative-growth sparkline + "בהשוואה ליום/שבוע/חודש
+קודם" %), 2×2 KPIs (התחילו לשחק, השלמו משחק, פעילים ב-…, השלמות שלבים), levels + devices (donut shades by
+size, "אחר" grey), recent players (3 rows) + "סיכום ביצועים" (completion rate; avg play time from
+`rpc('admin_play_time')`, migration 0004, bar scaled to 25 min; drop rate = started, not finished, not seen
+for 7 days). Header: collapse-sidebar chevron, range pill, bell (new players 24 h + game completions 7 d,
+dot when unseen, localStorage), account menu (refresh + sign out). The activity area chart was removed.
+Calibration overrides sit at the end of `admin.css`; verify by rendering at 1672×941 with the reference data
+and blending with the reference image.
+
+**Redesign of 15 Nov 2026 (superseded for the overview).** SaaS-style dashboard from Yotam's two-screen reference:
 right sidebar (logo, exactly two nav items: סקירה כללית / שחקנים, sleeping-cat SVG), hash routing
 (`#players`). Files: `Dashboard.tsx` (shell, header, account menu, refresh), `Overview.tsx`
 (5 KPIs, level-progress bars, device donut, recent players, activity area chart),
@@ -100,8 +110,10 @@ Migrations in `supabase/migrations/` (Yotam runs them manually in Supabase → S
 - `0001_player_analytics.sql` — **applied**.
 - `0002_player_device.sql` — given to Yotam; confirm with him whether it's applied
   (the dashboard handles both cases).
-- `0003_admin_activity.sql` — `admin_activity()` for the date range + activity chart; given to
-  Yotam on 15 Nov 2026 (dashboard shows a note until it is run).
+- `0003_admin_activity.sql` — `admin_activity()` for the date range (active-players tile); given to
+  Yotam on 15 Nov 2026.
+- `0004_admin_play_time.sql` — `admin_play_time()` for "זמן משחק ממוצע"; given to Yotam on
+  15 Nov 2026 (card shows "–" until it is run).
 
 **Do not create duplicate tables or re-run/rewrite existing migrations.** If the new
 design needs new data, add a new numbered migration (`0003_…sql`), make it
@@ -151,7 +163,7 @@ Security model (keep it):
 
 **Since the 15 Nov 2026 redesign the dashboard uses its own SaaS tokens (Yotam's brief):**
 bg `#F8F9FC`, primary `#7047EB`, ink `#172033`, secondary text `#64748B`, borders `#E8EAF0`,
-radius 12–16 px, very soft shadows, font **Heebo** (variable, self-hosted in `src/assets/fonts`).
+radius 12–18 px, very soft shadows, font **Heebo**. Overview v2 measured from the reference: page `#f6f5fd`, ink `#110f1f`, labels `#262b47`, tiles `#f3edfe`, bars `#6d3ae8` (variable, self-hosted in `src/assets/fonts`).
 The list below is the game's language (historical for the dashboard):
 
 - Hebrew UI, `dir="rtl"`. Font: **Secular One** only (one weight, 400; `font-synthesis: none`),

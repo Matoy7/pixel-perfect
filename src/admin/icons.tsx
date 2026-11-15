@@ -177,3 +177,40 @@ export const IconMenu = (p: P) => (
     <path d="M4 7h16M4 12h16M4 17h16" />
   </Svg>
 );
+export const IconBell = (p: P) => (
+  <Svg {...p}>
+    <path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.6 1.8a.5.5 0 0 1-.4.8H4.8a.5.5 0 0 1-.4-.8L6 16.5Z" />
+    <path d="M9.8 21.2a2.4 2.4 0 0 0 4.4 0" />
+  </Svg>
+);
+export const IconClock = (p: P) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="8.6" />
+    <path d="M12 7.4V12h4" />
+  </Svg>
+);
+export const IconBars = (p: P) => (
+  <Svg {...p}>
+    <path d="M5 20V12.5M9.7 20V7M14.3 20V4.5M19 20V10" strokeWidth={2.4} />
+    <path d="M3.5 20.5h17" />
+  </Svg>
+);
+export const IconArrowUp = (p: P) => (
+  <Svg strokeWidth={2.4} {...p}>
+    <path d="M12 19.5V5m-6 6 6-6 6 6" />
+  </Svg>
+);
+/** filled white gamepad (logo) */
+export const IconGamepadSolid = ({ size = 28, ...rest }: P) => (
+  <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" {...rest}>
+    <path
+      fill="currentColor"
+      d="M9.6 7.5h12.8c3.3 0 6.1 2.4 6.6 5.7l1.2 7.6c.5 3.2-2 6-5.2 5.7-1.6-.1-2.9-1.1-3.6-2.5l-.8-1.7c-.3-.6-.9-1-1.6-1h-6c-.7 0-1.3.4-1.6 1l-.8 1.7c-.7 1.4-2 2.4-3.6 2.5-3.2.3-5.7-2.5-5.2-5.7L3 13.2c.5-3.3 3.3-5.7 6.6-5.7Z"
+    />
+    <path d="M10.6 11.6v6M7.6 14.6h6" stroke="#6a36e6" strokeWidth="2.2" strokeLinecap="round" />
+    <circle cx="21.4" cy="12.7" r="1.5" fill="#6a36e6" />
+    <circle cx="24.4" cy="15.7" r="1.5" fill="#6a36e6" />
+    <circle cx="18.4" cy="15.7" r="1.5" fill="#6a36e6" />
+    <circle cx="21.4" cy="18.7" r="1.5" fill="#6a36e6" />
+  </svg>
+);

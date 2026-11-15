@@ -21,19 +21,21 @@ export type Player = {
   current_level: number;
   completed_levels_count: number;
   game_completed: boolean;
+  game_completed_at?: string | null;
   device_type?: string | null;
   device_os?: string | null;
   device_browser?: string | null;
   device_model?: string | null;
 };
+export type PlayTime = { avg_seconds: number | null; players: number };
 export type Activity = { active: number; unit: 'hour' | 'day'; series: { t: string; players: number }[] };
 
 /** Range of the date selector, in hours (the values admin_activity accepts). */
 export type Range = 24 | 168 | 720;
-export const RANGES: { value: Range; label: string; active: string }[] = [
-  { value: 24, label: '24 שעות אחרונות', active: 'פעילים ב-24 שעות' },
-  { value: 168, label: '7 ימים אחרונים', active: 'פעילים ב-7 ימים' },
-  { value: 720, label: '30 ימים אחרונים', active: 'פעילים ב-30 ימים' },
+export const RANGES: { value: Range; label: string; active: string; compare: string }[] = [
+  { value: 24, label: '24 שעות אחרונות', active: 'פעילים ב-24 שעות', compare: 'בהשוואה ליום קודם' },
+  { value: 168, label: '7 ימים אחרונים', active: 'פעילים ב-7 ימים', compare: 'בהשוואה לשבוע קודם' },
+  { value: 720, label: '30 ימים אחרונים', active: 'פעילים ב-30 ימים', compare: 'בהשוואה לחודש קודם' },
 ];
 
 export type AdminData = {
@@ -45,6 +47,8 @@ export type AdminData = {
   /** null = migration 0003 not run (or still loading) */
   activity: Activity | null;
   activityMissing: boolean;
+  /** null = migration 0004 not run (or still loading) */
+  playTime: PlayTime | null;
 };
 
 const TZ = (() => {
@@ -81,6 +85,7 @@ export function useAdminData(sb: SupabaseClient, range: Range) {
     players: [],
     activity: null,
     activityMissing: false,
+    playTime: null,
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -97,12 +102,13 @@ export function useAdminData(sb: SupabaseClient, range: Range) {
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
-    const [ov, lv, dv, pl] = await Promise.all([
+    const [ov, lv, dv, pl, , pt] = await Promise.all([
       sb.rpc('admin_overview'),
       sb.rpc('admin_level_stats'),
       sb.rpc('admin_device_stats'),
       loadPlayers(sb),
       loadActivity(range),
+      sb.rpc('admin_play_time'), // optional: migration 0004
     ]);
     const err = ov.error ?? lv.error ?? pl.error;
     if (err) setError(err.message);
@@ -113,6 +119,7 @@ export function useAdminData(sb: SupabaseClient, range: Range) {
       // device stats are optional: null = migration 0002 not run yet
       devices: dv.error ? null : ((dv.data as DeviceRow[]) ?? []),
       players: pl.data,
+      playTime: pt.error ? null : ((pt.data as PlayTime) ?? null),
     }));
     setLoadedAt(new Date());
     setLoading(false);
@@ -171,6 +178,48 @@ export function levelProgress(levels: LevelRow[]): LevelProgress[] {
     };
   });
 }
+
+/** Cumulative unique players over the selected range, and the change since its start. */
+export function growth(players: Player[], range: Range, now = Date.now()) {
+  const n = range === 24 ? 24 : range / 24;
+  const step = range === 24 ? 3600e3 : 86400e3;
+  const times = players.map((p) => new Date(p.first_seen_at).getTime()).sort((a, b) => a - b);
+  const upTo = (t: number) => {
+    let lo = 0;
+    let hi = times.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (times[mid] <= t) lo = mid + 1;
+      else hi = mid;
+    }
+    return lo;
+  };
+  const points = Array.from({ length: n + 1 }, (_, i) => upTo(now - (n - i) * step));
+  const start = points[0];
+  const end = points[n];
+  return { points, change: start ? (end - start) / start : null, added: end - start };
+}
+
+const WEEK = 7 * 24 * 3600 * 1000;
+/** סיכום ביצועים */
+export function performance(players: Player[], ov: Overview | null, now = Date.now()) {
+  const started = players.filter((p) => p.current_level > 0);
+  // left without finishing and not back for a week
+  const dropped = started.filter((p) => !p.game_completed && now - new Date(p.last_seen_at).getTime() >= WEEK).length;
+  return {
+    completion: ov && ov.players_started ? ov.players_completed / ov.players_started : null,
+    drop: started.length ? dropped / started.length : null,
+  };
+}
+
+/** "13m 42s" */
+export const durationText = (sec: number) => {
+  const s = Math.round(sec);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  return h ? `${h}h ${m}m` : `${m}m ${s % 60}s`;
+};
+export const pct1 = (n: number) => `${(Math.round(n * 1000) / 10).toFixed(1)}%`;
 
 /** Platform families shown in the dashboard. */
 export type Family = 'ios' | 'android' | 'windows' | 'mac' | 'other';
