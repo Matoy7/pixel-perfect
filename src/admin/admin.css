@@ -2234,3 +2234,268 @@ code {
   width: 7px;
   height: 7px;
 }
+
+/* ================================================================ refinement pass (spacing & proportions)
+   Same composition; calmer density: shorter top row, more air between rows, one card rhythm
+   (22 px sides, 18 px head top, 40 px icon tiles, 20 px titles), slightly smaller numbers and icons. */
+:root {
+  --pad: 22px;
+  --row-gap: 28px;
+}
+.o-grid {
+  gap: var(--row-gap);
+}
+@media (min-width: 561px) {
+  .a-main {
+    gap: 20px;
+  }
+  /* KPI tiles (overview + players) */
+  .a-kpi {
+    height: auto;
+    min-height: 96px;
+    padding: 0 22px 0 20px;
+  }
+  .a-kpi__value {
+    font-size: 38px;
+  }
+  .a-kpi__label {
+    margin-top: 6px;
+    font-size: 16.5px;
+  }
+  .a-kpi__icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    margin-bottom: 0;
+  }
+  .a-kpi__icon svg {
+    width: 30px;
+    height: 30px;
+  }
+  .a-kpi__text {
+    margin-top: 0;
+  }
+  .o-kpis {
+    gap: 16px;
+  }
+
+  /* hero */
+  .o-hero__text {
+    flex-basis: 262px;
+    margin-inline-end: 26px;
+    padding-top: 18px;
+  }
+  .o-hero__title h2 {
+    font-size: 21px;
+  }
+  .o-hero__icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+  .o-hero__icon svg {
+    width: 28px;
+    height: 28px;
+  }
+  .o-hero__value {
+    font-size: 70px;
+    margin-top: 10px;
+  }
+  .o-hero__pill {
+    height: 38px;
+    border-radius: 19px;
+    font-size: 15.5px;
+    margin-bottom: 20px;
+  }
+  .o-hero__arrow {
+    width: 16px;
+    height: 16px;
+  }
+  .o-spark {
+    margin: 66px 26px 22px 40px;
+  }
+
+  /* card frame: one rhythm for every card */
+  .o-card__head,
+  .o-levels .o-card__head,
+  .o-devices .o-card__head,
+  .o-recent .o-card__head,
+  .o-perf .o-card__head {
+    height: 62px;
+    padding: 18px var(--pad) 0;
+    gap: 12px;
+  }
+  .o-tile {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+  }
+  .o-tile svg {
+    width: 26px;
+    height: 26px;
+  }
+  .o-card__head h2,
+  .o-levels .o-card__head h2,
+  .o-devices .o-card__head h2 {
+    font-size: 20px;
+  }
+  .o-card__extra,
+  .o-link {
+    font-size: 16px;
+  }
+  .o-link svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* levels: tighter rows, same columns */
+  .a-lvl {
+    margin: 10px calc(var(--pad) + 8px) 0;
+  }
+  .a-lvl__row {
+    height: 26px;
+  }
+  .a-lvl__name,
+  .a-lvl__pct {
+    font-size: 16.5px;
+  }
+  .a-lvl__track {
+    height: 10px;
+    margin-inline: 28px 24px;
+  }
+
+  /* devices */
+  .o-donut {
+    height: auto;
+    margin: 10px var(--pad) 0;
+  }
+  .o-donut__chart,
+  .o-donut__chart svg {
+    width: 172px;
+    height: 172px;
+  }
+  .o-donut__center b {
+    font-size: 34px;
+  }
+  .o-donut__center span {
+    font-size: 15.5px;
+  }
+  .o-legend {
+    margin-top: 0;
+  }
+  .o-legend li {
+    height: 32px;
+    font-size: 16.5px;
+  }
+  .o-legend i {
+    width: 12px;
+    height: 12px;
+  }
+  .o-legend__pct {
+    width: 54px;
+  }
+
+  /* recent players: room for the rows */
+  .o-table {
+    margin: 12px var(--pad) var(--pad);
+    width: calc(100% - 2 * var(--pad));
+  }
+  .o-table th {
+    height: 34px;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .o-table td {
+    height: 48px;
+    font-size: 16.5px;
+  }
+  .o-table th:first-child,
+  .o-table td:first-child {
+    padding-inline-start: 4px;
+  }
+  .o-table .a-badge {
+    height: 28px;
+    padding: 0 12px;
+    font-size: 15px;
+  }
+  .o-table .a-badge svg {
+    width: 18px;
+    height: 18px;
+  }
+  .o-table .a-badge__dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* performance summary */
+  .o-perf__list {
+    gap: 10px;
+    margin: 12px var(--pad) var(--pad);
+  }
+  .o-perf__row {
+    height: 52px;
+    padding-inline-start: 18px;
+    grid-template-columns: minmax(max-content, 1fr) minmax(56px, 200px) 100px;
+  }
+  .o-perf__label {
+    font-size: 16.5px;
+  }
+  .o-perf__value {
+    font-size: 16.5px;
+  }
+  .o-perf__track {
+    height: 10px;
+  }
+}
+
+/* desktop: aligned row heights (content may grow, rows stay even) */
+@media (min-width: 1361px) {
+  .o-row--top {
+    height: 212px;
+  }
+  .o-kpis {
+    height: 100%;
+  }
+  .o-hero {
+    margin-top: 0;
+    height: 100%;
+  }
+  .o-row--mid {
+    height: auto;
+    min-height: 262px;
+    margin-top: 0;
+  }
+  .o-row--bot {
+    height: auto;
+    min-height: 264px;
+  }
+}
+/* tablet: same order and hierarchy, comfortable gaps */
+@media (min-width: 561px) and (max-width: 1360px) {
+  .o-hero {
+    min-height: 212px;
+  }
+  .o-card {
+    padding-bottom: 0;
+  }
+  .o-levels .a-lvl,
+  .o-devices .o-donut {
+    margin-bottom: var(--pad);
+  }
+}
+@media (max-width: 560px) {
+  :root {
+    --row-gap: 20px;
+  }
+}
+@media (min-width: 561px) {
+  /* legend hugs the card's right padding (the donut row is laid out LTR) */
+  .o-legend {
+    margin-left: auto;
+    margin-right: 0;
+    flex: 0 1 300px;
+  }
+}
+.a-sub [dir='ltr'] {
+  white-space: nowrap;
+}
