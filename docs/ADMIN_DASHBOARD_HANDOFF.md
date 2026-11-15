@@ -161,6 +161,16 @@ Security model (keep it):
 
 ## 7. Design language
 
+**Design system (15 Nov 2026, current — supersedes the pixel-matched sizes below).** `src/admin/admin.css`
+is one token-based stylesheet; change tokens, not one-off values:
+- Spacing `--s-1..8` = 4, 8, 12, 16, 24, 32, 40, 48 px. Card padding `--card-pad` 24 (16 on phones),
+  row gap `--row-gap` 24 (16 ≤900 px), grid gaps 16, page padding 24/32, sidebar 240 px (72 collapsed).
+- Type `--t-page` 26, `--t-kpi-1` 40 (hero), `--t-kpi-2` 28 (KPI tiles, donut total), `--t-card` 16/600,
+  `--t-body` 14, `--t-table` 13, `--t-meta` 12. Weights: 700 numbers/page title, 600 card titles, 400–500 text.
+- Radii 16 cards / 12 tiles & menus / 8 controls; one soft shadow `--shadow`, `--shadow-pop` for popovers.
+- Desktop rows: top 192 px (hero + 2×2 KPIs 88 px), mid/bottom rows size to content (stretch to even height).
+- Font stays Heebo (variable, self-hosted): excellent Hebrew legibility at 12–14 px.
+
 **Since the 15 Nov 2026 redesign the dashboard uses its own SaaS tokens (Yotam's brief):**
 bg `#F8F9FC`, primary `#7047EB`, ink `#172033`, secondary text `#64748B`, borders `#E8EAF0`,
 radius 12–18 px, very soft shadows, font **Heebo**. Overview v2 measured from the reference: page `#f6f5fd`, ink `#110f1f`, labels `#262b47`, tiles `#f3edfe`, bars `#6d3ae8` (variable, self-hosted in `src/assets/fonts`).
