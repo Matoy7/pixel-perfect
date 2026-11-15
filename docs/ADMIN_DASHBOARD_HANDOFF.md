@@ -82,6 +82,14 @@ Data the dashboard currently loads (all in `Dashboard.tsx` `load()`):
 
 Removed on purpose (Yotam asked): the "פעילות אחרונה" (recent activity) panel. Don't bring it back unless asked.
 
+**Sources card (15 Nov 2026).** "סיכום ביצועים" was replaced by "פילוח מקורות משתמשים" (`Sources` in
+`Overview.tsx`): players per acquisition source (Facebook, LinkedIn, Instagram, Google, ישיר, אחר), count + %,
+compact bar rows. **The game does not record acquisition source yet** (no referrer / UTM / click-id capture,
+no column), so the card renders `rows={null}` → an empty state. To light it up: capture `utm_source` /
+`document.referrer` on a player's first visit, store it once per player (new migration: column + validated
+SECURITY DEFINER setter + `admin_source_stats()`), and pass the rows to `<Sources>`. The play-time call
+(0004) is no longer used by the dashboard; the migration stays (harmless if run).
+
 **Overview v2 (15 Nov 2026 evening, current)** — pixel-matched to Yotam's second reference
 (1672×941): purple hero "שחקנים ייחודיים" (total + cumulative-growth sparkline + "בהשוואה ליום/שבוע/חודש
 קודם" %), 2×2 KPIs (התחילו לשחק, השלמו משחק, פעילים ב-…, השלמות שלבים), levels + devices (donut shades by

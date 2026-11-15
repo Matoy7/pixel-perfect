@@ -214,3 +214,9 @@ export const IconGamepadSolid = ({ size = 28, ...rest }: P) => (
     <circle cx="21.4" cy="18.7" r="1.5" fill="#6a36e6" />
   </svg>
 );
+export const IconPie = (p: P) => (
+  <Svg {...p}>
+    <path d="M12 3.5v8.5h8.5" />
+    <path d="M20.5 12A8.5 8.5 0 1 1 12 3.5a8.5 8.5 0 0 1 8.5 8.5Z" />
+  </Svg>
+);

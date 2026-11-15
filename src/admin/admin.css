@@ -1759,3 +1759,69 @@ h2 {
     padding: var(--s-3) var(--s-4);
   }
 }
+
+/* ================================================================ user sources (פילוח מקורות משתמשים) */
+/* compact rows on the level-bar rhythm, so six sources fit the card */
+.o-src {
+  display: grid;
+  gap: var(--s-1);
+}
+.o-src__row {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 88px;
+  align-items: center;
+  height: 24px;
+}
+.o-src__name {
+  font-size: var(--t-table);
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.o-src .o-perf__track {
+  margin-inline: var(--s-4);
+}
+.o-src__value {
+  text-align: left;
+  font-size: var(--t-table);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.o-src__value b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.o-src__value span {
+  color: var(--muted);
+}
+.o-empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  padding: var(--s-4) var(--s-5);
+  text-align: center;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-md);
+}
+.o-empty-state .o-tile {
+  margin-bottom: var(--s-1);
+}
+.o-empty-state b {
+  font-size: var(--t-body);
+  font-weight: 600;
+  color: var(--ink);
+}
+.o-empty-state span:not(.o-tile) {
+  max-width: 320px;
+  font-size: var(--t-meta);
+  color: var(--muted);
+}
+@media (max-width: 560px) {
+  .o-src__row {
+    grid-template-columns: 64px minmax(0, 1fr) 80px;
+  }
+}

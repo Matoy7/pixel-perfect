@@ -27,7 +27,6 @@ export type Player = {
   device_browser?: string | null;
   device_model?: string | null;
 };
-export type PlayTime = { avg_seconds: number | null; players: number };
 export type Activity = { active: number; unit: 'hour' | 'day'; series: { t: string; players: number }[] };
 
 /** Range of the date selector, in hours (the values admin_activity accepts). */
@@ -47,8 +46,6 @@ export type AdminData = {
   /** null = migration 0003 not run (or still loading) */
   activity: Activity | null;
   activityMissing: boolean;
-  /** null = migration 0004 not run (or still loading) */
-  playTime: PlayTime | null;
 };
 
 const TZ = (() => {
@@ -85,7 +82,6 @@ export function useAdminData(sb: SupabaseClient, range: Range) {
     players: [],
     activity: null,
     activityMissing: false,
-    playTime: null,
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -102,13 +98,12 @@ export function useAdminData(sb: SupabaseClient, range: Range) {
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
-    const [ov, lv, dv, pl, , pt] = await Promise.all([
+    const [ov, lv, dv, pl] = await Promise.all([
       sb.rpc('admin_overview'),
       sb.rpc('admin_level_stats'),
       sb.rpc('admin_device_stats'),
       loadPlayers(sb),
       loadActivity(range),
-      sb.rpc('admin_play_time'), // optional: migration 0004
     ]);
     const err = ov.error ?? lv.error ?? pl.error;
     if (err) setError(err.message);
@@ -119,7 +114,6 @@ export function useAdminData(sb: SupabaseClient, range: Range) {
       // device stats are optional: null = migration 0002 not run yet
       devices: dv.error ? null : ((dv.data as DeviceRow[]) ?? []),
       players: pl.data,
-      playTime: pt.error ? null : ((pt.data as PlayTime) ?? null),
     }));
     setLoadedAt(new Date());
     setLoading(false);
@@ -200,26 +194,19 @@ export function growth(players: Player[], range: Range, now = Date.now()) {
   return { points, change: start ? (end - start) / start : null, added: end - start };
 }
 
-const WEEK = 7 * 24 * 3600 * 1000;
-/** סיכום ביצועים */
-export function performance(players: Player[], ov: Overview | null, now = Date.now()) {
-  const started = players.filter((p) => p.current_level > 0);
-  // left without finishing and not back for a week
-  const dropped = started.filter((p) => !p.game_completed && now - new Date(p.last_seen_at).getTime() >= WEEK).length;
-  return {
-    completion: ov && ov.players_started ? ov.players_completed / ov.players_started : null,
-    drop: started.length ? dropped / started.length : null,
-  };
-}
-
-/** "13m 42s" */
-export const durationText = (sec: number) => {
-  const s = Math.round(sec);
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  return h ? `${h}h ${m}m` : `${m}m ${s % 60}s`;
-};
 export const pct1 = (n: number) => `${(Math.round(n * 1000) / 10).toFixed(1)}%`;
+
+/** Players per acquisition source (Facebook, Google, direct…). */
+export type SourceRow = { source: string; players: number };
+const SOURCE_LABEL: Record<string, string> = {
+  facebook: 'Facebook',
+  linkedin: 'LinkedIn',
+  instagram: 'Instagram',
+  google: 'Google',
+  direct: 'ישיר',
+  other: 'אחר',
+};
+export const sourceLabel = (s: string) => SOURCE_LABEL[s.toLowerCase()] ?? s;
 
 /** Platform families shown in the dashboard. */
 export type Family = 'ios' | 'android' | 'windows' | 'mac' | 'other';
