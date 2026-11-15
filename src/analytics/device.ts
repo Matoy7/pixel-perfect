@@ -65,11 +65,14 @@ export async function detectDevice(): Promise<DeviceInfo> {
     model = 'PC';
   }
 
-  const browser = /FBAN|FBAV/.test(ua)
-    ? 'Facebook'
+  // in-app browsers first (they also carry Safari/Chrome tokens): they tell which app the link was opened in
+  const browser = /LinkedInApp/.test(ua)
+    ? 'LinkedIn'
     : /Instagram/.test(ua)
       ? 'Instagram'
-      : /SamsungBrowser/.test(ua)
+      : /FBAN|FBAV|FB_IAB/.test(ua)
+        ? 'Facebook'
+        : /SamsungBrowser/.test(ua)
         ? 'Samsung Internet'
         : /EdgA?\/|EdgiOS/.test(ua)
           ? 'Edge'

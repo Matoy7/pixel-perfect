@@ -11,7 +11,9 @@ import {
   num,
   pct,
   pct1,
+  SOURCE_TAIL,
   sourceLabel,
+  sourcesFromPlayers,
   status,
   type AdminData,
   type Range,
@@ -33,8 +35,8 @@ function Panel({ icon, title, extra, className = '', children }: { icon: ReactNo
 }
 
 /**
- * פילוח מקורות משתמשים: players per acquisition source, biggest first, "other" last.
- * rows = null → the game does not record sources yet (nothing is invented).
+ * פילוח מקורות משתמשים: players per source, biggest first, regular browser / other last.
+ * Empty rows → no source data recorded (nothing is invented).
  */
 function Sources({ rows }: { rows: SourceRow[] | null }) {
   const list = (rows ?? []).filter((r) => r.players > 0);
@@ -46,13 +48,12 @@ function Sources({ rows }: { rows: SourceRow[] | null }) {
           <IconPie />
         </span>
         <b>אין עדיין נתוני מקורות</b>
-        <span>המשחק עדיין לא שומר מאיפה מגיעים השחקנים, למשל מפייסבוק, מגוגל או מכניסה ישירה, ולכן אין נתונים להצגה.</span>
+        <span>עדיין לא נשמר באיזו אפליקציה או בדפדפן נפתח המשחק, ולכן אין נתונים להצגה.</span>
       </div>
     );
   }
-  const sorted = [...list].sort((a, b) =>
-    a.source === 'other' ? 1 : b.source === 'other' ? -1 : b.players - a.players,
-  );
+  const tail = (s: string) => SOURCE_TAIL.indexOf(s);
+  const sorted = [...list].sort((a, b) => tail(a.source) - tail(b.source) || b.players - a.players);
   return (
     <div className="o-src">
       {sorted.map((r) => (
@@ -68,6 +69,7 @@ function Sources({ rows }: { rows: SourceRow[] | null }) {
           </span>
         </div>
       ))}
+      <p className="o-src__note">לפי האפליקציה שבה נפתח המשחק בביקור האחרון של כל שחקן ({num(total)} שחקנים)</p>
     </div>
   );
 }
@@ -77,6 +79,7 @@ export function Overview({ data, range, loading }: { data: AdminData; range: Ran
   const levels = useMemo(() => levelProgress(data.levels), [data.levels]);
   const devices = useMemo(() => (data.devices ? deviceFamilies(data.devices) : null), [data.devices]);
   const grow = useMemo(() => growth(players, range), [players, range]);
+  const sources = useMemo(() => sourcesFromPlayers(players), [players]);
   const recent = players.slice(0, 3); // already newest activity first
   const r = RANGES.find((x) => x.value === range)!;
   // active in the selected range (0003); without it, the fixed 24 h figure
@@ -133,8 +136,7 @@ export function Overview({ data, range, loading }: { data: AdminData; range: Ran
 
       <div className="o-row o-row--bot">
         <Panel icon={<IconPie />} title="פילוח מקורות משתמשים" className="o-perf o-sources">
-          {/* acquisition source is not collected by the game yet */}
-          <Sources rows={null} />
+          <Sources rows={sources} />
         </Panel>
         <Panel
           icon={<IconClock />}

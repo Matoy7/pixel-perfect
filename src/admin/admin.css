@@ -1825,3 +1825,8 @@ h2 {
     grid-template-columns: 64px minmax(0, 1fr) 80px;
   }
 }
+.o-src__note {
+  margin: var(--s-2) 0 0;
+  font-size: var(--t-meta);
+  color: var(--muted);
+}

@@ -83,12 +83,13 @@ Data the dashboard currently loads (all in `Dashboard.tsx` `load()`):
 Removed on purpose (Yotam asked): the "פעילות אחרונה" (recent activity) panel. Don't bring it back unless asked.
 
 **Sources card (15 Nov 2026).** "סיכום ביצועים" was replaced by "פילוח מקורות משתמשים" (`Sources` in
-`Overview.tsx`): players per acquisition source (Facebook, LinkedIn, Instagram, Google, ישיר, אחר), count + %,
-compact bar rows. **The game does not record acquisition source yet** (no referrer / UTM / click-id capture,
-no column), so the card renders `rows={null}` → an empty state. To light it up: capture `utm_source` /
-`document.referrer` on a player's first visit, store it once per player (new migration: column + validated
-SECURITY DEFINER setter + `admin_source_stats()`), and pass the rows to `<Sources>`. The play-time call
-(0004) is no longer used by the dashboard; the migration stays (harmless if run).
+`Overview.tsx`). Data = `players.device_browser` (migration 0002, browser of the player's **latest** visit),
+via `sourcesFromPlayers()` in `data.tsx`: in-app browsers Facebook / Instagram / LinkedIn name the app the
+link was opened in; any other browser = "דפדפן רגיל" (direct, Google, messaging… can't be told apart);
+players without device info are skipped. `src/analytics/device.ts` detects LinkedIn (`LinkedInApp`) and
+Facebook's Android `FB_IAB` since 15 Nov 2026 — earlier LinkedIn visits were stored as Safari/Chrome.
+For Google vs direct, a future change would capture `utm_source` / `document.referrer` (new migration).
+The play-time call (0004) is no longer used by the dashboard; the migration stays (harmless if run).
 
 **Overview v2 (15 Nov 2026 evening, current)** — pixel-matched to Yotam's second reference
 (1672×941): purple hero "שחקנים ייחודיים" (total + cumulative-growth sparkline + "בהשוואה ליום/שבוע/חודש

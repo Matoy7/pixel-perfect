@@ -204,9 +204,28 @@ const SOURCE_LABEL: Record<string, string> = {
   instagram: 'Instagram',
   google: 'Google',
   direct: 'ישיר',
+  browser: 'דפדפן רגיל',
   other: 'אחר',
 };
 export const sourceLabel = (s: string) => SOURCE_LABEL[s.toLowerCase()] ?? s;
+/** Listed last, after the named sources. */
+export const SOURCE_TAIL = ['browser', 'other'];
+
+const IN_APP: Record<string, string> = { Facebook: 'facebook', Instagram: 'instagram', LinkedIn: 'linkedin' };
+/**
+ * Source from data the game already records: the browser of the player's latest visit
+ * (migration 0002). In-app browsers name the app the link was opened in; any other browser
+ * = a regular browser (direct, search, messaging… cannot be told apart). No device info → skipped.
+ */
+export function sourcesFromPlayers(players: Player[]): SourceRow[] {
+  const counts = new Map<string, number>();
+  for (const p of players) {
+    if (!p.device_browser) continue;
+    const key = IN_APP[p.device_browser] ?? 'browser';
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return [...counts].map(([source, players]) => ({ source, players }));
+}
 
 /** Platform families shown in the dashboard. */
 export type Family = 'ios' | 'android' | 'windows' | 'mac' | 'other';
